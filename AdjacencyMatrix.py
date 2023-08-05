@@ -82,31 +82,6 @@ class Graph:
                     for vertex2, weight in edges.items():
                         if package.address == vertex1 or package.address == vertex2:
                             package.edge_weight = weight
-    # # Associates packages with vertices in the graph based on their addresses
-    # # If an address is already already associated with a vertex, then the package is added to the list of packages for that vertex
-    # def packages_vertex_associate(self, package_file):
-    #     with open(package_file) as csv_file: # Open package file WGUPS Package File Formatted.csv
-    #         csv_reader = csv.reader(csv_file)
-    #         # next(csv_reader, None)  # Skip header
-    #         for row in csv_reader: # Read each row in csv file
-    #             package_id = int(row[0])
-    #             address = row[1]
-    #
-    #             # Create a dictionary representing the package
-    #             package = {
-    #                 'package_id': package_id,
-    #                 'address': address,
-    #                 'city': row[2],
-    #                 'state': row[3],
-    #                 'zip': row[4],
-    #                 'deadline': row[5],
-    #                 'weight': row[6],
-    #                 'notes': row[7]
-    #             }
-    #             if address in self.vertices: # Check if the package is already associated with the vertex
-    #                 vertex_packages = self.vertices[address]
-    #                 if package not in vertex_packages: # If the package is not associated, add it to the list of vertex packages
-    #                     vertex_packages.append(package)
 
 
 # Get data from WGUPS_distances in order to create edges between vertices
