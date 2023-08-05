@@ -41,6 +41,11 @@ class Trucks:
         self.pred_vertex = []
         # # Create an instance of TimeTracker if it doesn't exist
         self.time_tracker = TimeTracker()
+        # Associate truck ID with Trucks object
+        self.truck_id = 0
+
+    def insert_truck_id(self, truck_id):
+        self.truck_id = truck_id
 
     # Insert packages to list self.packages and address of package to route to
     # list self.route
@@ -454,12 +459,10 @@ def find_shortest_route_to_deliver(truck, graph):
     # Will make a copy of the pred_vertex to be able to use to find last package.address
     # and add route distance back to the hub
     pred_vertex_copy = []
-    
     # Use a while loop to iterate over the packages
     while truck.get_packages():
         # Remove the first package from the truck
         package = truck.get_packages().pop(0)
-        
         # Vertex to travel to
         dest_vertex = package.address
         # Calculate the shortest distances and pred_vertex using Dijkstra's algorithm
@@ -469,18 +472,22 @@ def find_shortest_route_to_deliver(truck, graph):
         # Insert the calculated distances and pred_vertex into the Trucks object
         truck.insert_distances_pred_vertex(distances1[dest_vertex], pred_vertex1[dest_vertex])
         # Update time during delivery
-        truck.time_tracker.update_current_truck_time(distances1[dest_vertex], truck)
+        time_delivered = truck.time_tracker.update_current_truck_time(distances1[dest_vertex], truck.truck_id)
+        # Insert the time_delivered into package
+        truck.time_tracker.insert_current_truck_time_to_package(package, time_delivered)
+        # Update time_delivered for packages sharing the same address
+        for other_package, status_info in truck.time_tracker.packages_status.items():
+            if other_package != package and other_package.address == package.address and status_info['status'] != 'DELIVERED':
+                truck.time_tracker.insert_current_truck_time_to_package(other_package, time_delivered)
         # Skip adding the distance if the next package is already at the dest_vertex, share addresses
         if distances1[dest_vertex] != 0:
             total = distances1[dest_vertex]
             total_distance += total
-        # Mark package as 'DELIVERED'
-        truck.time_tracker.mark_package_delivered(package)
         # Update start_vertex1 to the dest_vertex1 for the next iteration
         start_vertex1 = dest_vertex
         # Debug print, pred_vertex and dest_vertex pair for the current destination
         # print(f"Pred Vertex: {pred_vertex1[dest_vertex]}, Destination: {dest_vertex}")
-    
+    truck.time_tracker.update_delivered_delivery(truck.truck_id)
     # Route of last package back to hub
     optimized_route_back_to_hub = find_optimized_route_back_to_hub(pred_vertex_copy, start_vertex1,
                                                                    '4001 South 700 East')
@@ -490,9 +497,7 @@ def find_shortest_route_to_deliver(truck, graph):
         distances1, _ = dijkstra(graph_access, from_vertex)
         total = distances1[from_vertex]
         total_distance += total
-
     total_distance = round(total_distance, 2)
-    # truck.time_tracker.print_package_status()
 
     return total_distance
 
@@ -506,22 +511,26 @@ def deliver_packages(trucks, graph):
         medium_priority: "MEDIUM_PRIORITY",
         low_priority: "LOW_PRIORITY"
     }
+    # while not all(truck.time_tracker.is_delivery_completed() for truck in trucks):
     for current_truck in trucks:
         # Current truck time tracker high_priority, medium_priority, low_priority
         time_tracker = current_truck.time_tracker
         # Get the name of the current truck
         truck_name = truck_names[current_truck]
-        # Call the function to find the shortest route to deliver packages
-        print(f"{truck_name}, OPTIMIZED_DELIVERY_ROUTE: ", current_truck.route)
-        optimized_route_back_to_hub = find_optimized_route_back_to_hub(
-            current_truck.pred_vertex, current_truck.route[-1], '4001 South 700 East'
-        )
-        print("BACK_TO_HUB:", optimized_route_back_to_hub)
-        total_distance = find_shortest_route_to_deliver(current_truck, graph)
-        # Update miles traveled for the current truck
-        time_tracker.update_miles_traveled(total_distance, current_truck)
-        time_tracker.print_delivery_status(current_truck)
-        time_tracker.print_miles_traveled(current_truck)
+        # Check if current truck is ready for delivery
+        if current_truck.time_tracker.is_ready_to_deliver(current_truck):
+            # Initialize package status to 'IN_TRANSIT' for loaded packages
+            time_tracker.initialize_status_to_in_transit(current_truck.truck_id)
+            # Call the function to find the shortest route to deliver packages
+            print(f"{truck_name}, OPTIMIZED_DELIVERY_ROUTE: ", current_truck.route)
+            optimized_route_back_to_hub = find_optimized_route_back_to_hub(
+                current_truck.pred_vertex, current_truck.route[-1], '4001 South 700 East'
+            )
+            print("BACK_TO_HUB:", optimized_route_back_to_hub)
+            total_distance = find_shortest_route_to_deliver(current_truck, graph)
+            # Update miles traveled for the current truck
+            time_tracker.update_miles_traveled(total_distance, current_truck.truck_id)
+            time_tracker.print_miles_traveled(current_truck.truck_id)
 
 
 def two_opt_swap(route, i, j):
@@ -610,10 +619,13 @@ def find_optimized_route_back_to_hub(pred_list, destination_vertex, hub_vertex):
 
 # Delivered by 9:00am, constraint of having multiple packages on same truck delivered together, Truck 1
 high_priority = Trucks()
+high_priority.insert_truck_id(1)
 # Delivered by 10:30am, constraint of having multiple packages required on, Truck 2
 medium_priority = Trucks()
+medium_priority.insert_truck_id(2)
 # Delivered by EOD, no constraints required for packages EOD will be defined as 5:00pm, Truck 3
 low_priority = Trucks()
+low_priority.insert_truck_id(3)
 
 # Load trucks
 load_trucks(high_priority, medium_priority, low_priority, graph_access, track_package_id1)
@@ -622,14 +634,14 @@ load_trucks(high_priority, medium_priority, low_priority, graph_access, track_pa
 high_loaded_packages = high_priority.get_packages()
 medium_loaded_packages = medium_priority.get_packages()
 low_loaded_packages = low_priority.get_packages()
-high_priority.time_tracker.initialize_multiple_package_status(high_loaded_packages, 'AT_HUB')
-medium_priority.time_tracker.initialize_multiple_package_status(medium_loaded_packages, 'AT_HUB')
-low_priority.time_tracker.initialize_multiple_package_status(low_loaded_packages, 'AT_HUB')
+high_priority.time_tracker.initialize_multiple_package_status(high_loaded_packages, 'AT_HUB', 1, 8.0)
+medium_priority.time_tracker.initialize_multiple_package_status(medium_loaded_packages, 'AT_HUB', 2, 9.05)
+low_priority.time_tracker.initialize_multiple_package_status(low_loaded_packages, 'AT_HUB', 3, 8.0)
 
 # Initialize tracking trucks
-high_priority.time_tracker.insert_current_truck(high_priority)
-medium_priority.time_tracker.insert_current_truck(medium_priority)
-low_priority.time_tracker.insert_current_truck(low_priority)
+high_priority.time_tracker.insert_current_truck(high_priority.truck_id)
+medium_priority.time_tracker.insert_current_truck(medium_priority.truck_id)
+low_priority.time_tracker.insert_current_truck(low_priority.truck_id)
 
 # Sort the packages with nearest neighbor algorithm loaded on trucks
 sort_packages_on_truck(high_priority, graph_access)
@@ -641,9 +653,18 @@ two_opt_route(high_priority, graph_access)
 two_opt_route(medium_priority, graph_access)
 two_opt_route(low_priority, graph_access)
 
+
+# print('---NEW LINE---\n')
+# print("HIGH_PRIORITY", high_priority.time_tracker.print_package_status())
+# print()
+# print("MEDIUM_PRIORITY", medium_priority.time_tracker.print_package_status())
+# print()
+# print("LOW_PRIORITY", low_priority.time_tracker.print_package_status())
+# print("---NEW LINE---\n")
 # Simulate package delivery
 trucks_list = [high_priority, medium_priority, low_priority]
 deliver_packages(trucks_list, graph_access)
+# print("HIGH_PRIORITY", high_priority.time_tracker.print_package_status())
 
 # # Print the packages delivered and the time upon completion
 # print("HIGH_PRIORITY")
