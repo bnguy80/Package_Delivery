@@ -96,12 +96,20 @@ class HashMap:
         hashmap = self.get_hashmap()
         return hashmap
 
-    def get_all_packages(self):
-        all_packages = []
-        for bucket in self.map:
-            for pair in bucket:
-                all_packages.append(pair[1])
-        return all_packages
+    def print_get_all_packages(self):
+        print("All Packages:")
+        print("-" * 40)
+
+        for bucket_index, bucket in enumerate(self.map):
+            print(f"Bucket {bucket_index}:")
+            if not bucket:
+                print("No packages in this bucket")
+            else:
+                for package_id, package in bucket:
+                    print(f"Package ID: {package_id}")
+                    print(package)
+                    print("-" * 20)
+            print("=" * 40)
 
     # To update value in key-value pair if changed
     def update(self, key, value):
@@ -136,7 +144,6 @@ class HashMap:
 
 # Load Hash Map object with the values from csv file
 def load_hash_map(fileName):
-
     insert_into_hash_map = HashMap()
     with open(fileName) as csv_file:
         csv_reader = csv.reader(csv_file)

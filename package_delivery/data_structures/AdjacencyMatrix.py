@@ -1,5 +1,5 @@
 import csv
-from HashMap import package_hashmap, check_all_packages
+from package_delivery.data_structures.HashMap import package_hashmap
 
 
 # print(package_hashmap) # hashmap object printing correctly
