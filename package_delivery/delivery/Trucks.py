@@ -29,10 +29,6 @@ track_package_id1 = set()
 left_over1 = []
 
 
-# Calculate the shortest routes for all vertices in the graph before loading the trucks
-# dijkstra(graph_access, '4001 South 700 East')
-
-
 class Trucks:
     # List of packages, route, distances, predecessor vertices to be loaded onto Trucks object
     def __init__(self):
@@ -114,6 +110,22 @@ class Trucks:
                     total_edge_weight += package.edge_weight
         # Return the calculated 'edge_weight' for the associated packages on the truck
         return total_edge_weight
+
+    # Set the edge_weight for all packages on truck
+    @staticmethod
+    def set_edge_weight(truck):
+        # From hub
+        start_vertex = '4001 South 700 East'
+        # Calculate edge weight between the package's location and the truck's starting location
+        for package in truck.get_packages():
+            # Destination address of second package
+            dest_vertex = package.address
+            if start_vertex in graph_access.edge_weight and dest_vertex in graph_access.edge_weight:
+                edge_weight = graph_access.edge_weight[start_vertex][dest_vertex]
+                package.edge_weight = edge_weight
+            else:
+                # Handle the case where the edge weight is not found in the graph
+                package.edge_weight = None
 
     """Get packages from the AdjacencyMatrix.Graph object with the specified delivery_deadline 
        'EOD' and the constraints associated with each individual packages
@@ -206,20 +218,7 @@ class Trucks:
 # priority_queue to pop off packages on trucks until empty?
 # Once first truck is empty driver returns to hub to get next truck for deliveries
 def load_trucks(truck_high_priority, truck_medium_priority, truck_low_priority, graph, track_package_id):
-    # Set the edge_weight for all packages on truck
-    def set_edge_weight(truck):
-        # From hub
-        start_vertex = '4001 South 700 East'
-        # Calculate edge weight between the package's location and the truck's starting location
-        for package in truck.get_packages():
-            # Destination address of second package
-            dest_vertex = package.address
-            if start_vertex in graph.edge_weight and dest_vertex in graph.edge_weight:
-                edge_weight = graph.edge_weight[start_vertex][dest_vertex]
-                package.edge_weight = edge_weight
-            else:
-                # Handle the case where the edge weight is not found in the graph
-                package.edge_weight = None
+
 
     # Define the arguments as a single variable
     # Load high priority
@@ -237,7 +236,7 @@ def load_trucks(truck_high_priority, truck_medium_priority, truck_low_priority, 
         # 'track_time': track_time1
     }
     load_packages(**args1)
-    set_edge_weight(truck_high_priority)
+    Trucks.set_edge_weight(truck_high_priority)
 
     # Load medium priority
     delivery_deadline2 = "10:30 AM"
@@ -252,7 +251,7 @@ def load_trucks(truck_high_priority, truck_medium_priority, truck_low_priority, 
         # 'track_time': track_time2
     }
     load_packages(**args2)
-    set_edge_weight(truck_medium_priority)
+    Trucks.set_edge_weight(truck_medium_priority)
 
     # Load low priority
     delivery_deadline3 = "EOD"
@@ -268,7 +267,7 @@ def load_trucks(truck_high_priority, truck_medium_priority, truck_low_priority, 
         # 'track_time': track_time3
     }
     load_packages(**args3)
-    set_edge_weight(truck_low_priority)
+    Trucks.set_edge_weight(truck_low_priority)
 
     # After loading packages to satisfy constraints
     # Combine the left-over packages from all three priority levels
@@ -531,6 +530,8 @@ def deliver_packages(trucks, graph, start_interval, end_interval):
         time_tracker = current_truck.time_tracker
         # Get the name of the current truck
         truck_name = truck_names[current_truck]
+        # Initialize the time for the current truck
+        time_tracker.insert_current_truck(current_truck.truck_id)
         print("NEW LINE---\n")
         # Check if current truck is ready for delivery
         if current_truck.time_tracker.is_ready_to_deliver(current_truck):
@@ -548,9 +549,6 @@ def deliver_packages(trucks, graph, start_interval, end_interval):
                 # Update miles traveled for the current truck
                 time_tracker.update_miles_traveled(total_distance, current_truck.truck_id)
 
-            # # Update the status of the packages based on time intervals
-            # time_tracker.print_package_status()
-
             # Check if the start time is 9:35 AM and update at 10:20 AM
             # If so, update the package with ID 9 to the new address
             if start_interval == '9:35':
@@ -563,9 +561,10 @@ def deliver_packages(trucks, graph, start_interval, end_interval):
                 time_tracker.update_package_status(package_to_update, new_address, new_city, new_state, new_zipcode,
                                                    new_special_notes)
                 print("PACKAGE UPDATED, Address updated from 300 State St to 410 S State St:")
+
+            # Check if truck 1 has completed its delivery
             if current_truck == high_priority and current_truck.time_tracker.is_delivery_completed():
                 truck1_delivery_completed = True
-                print("TRUCK1_DELIVERY_COMPLETED:", truck1_delivery_completed)
 
             if current_truck == low_priority:
                 if truck1_delivery_completed and current_truck.time_tracker.is_ready_to_deliver(current_truck):
@@ -574,8 +573,8 @@ def deliver_packages(trucks, graph, start_interval, end_interval):
             if current_truck == high_priority or current_truck == medium_priority:
                 filtered_packages = current_truck.time_tracker.filter_packages_by_time_range(start_interval,
                                                                                              end_interval)
+                print("Start time:", start_interval, "End time:", end_interval)
                 print("FILTERED_PACKAGES:", filtered_packages)
-
                 time_tracker.print_miles_traveled(current_truck.truck_id)
 
 
@@ -606,6 +605,7 @@ def deliver_truck3_packages(truck3, graph, start_interval, end_interval):
     time_tracker.update_miles_traveled(total_distance, truck3.truck_id)
 
     filtered_packages = truck3.time_tracker.filter_packages_by_time_range(start_interval, end_interval)
+    print("Start time:", start_interval, "End time:", end_interval)
     print("FILTERED_PACKAGES:", filtered_packages)
 
     time_tracker.print_miles_traveled(truck3.truck_id)
@@ -722,9 +722,9 @@ low_priority.insert_truck_id(3)
 # Load trucks
 load_trucks(high_priority, medium_priority, low_priority, graph_access, track_package_id1)
 # Initialize tracking trucks
-high_priority.time_tracker.insert_current_truck(high_priority.truck_id)
-medium_priority.time_tracker.insert_current_truck(medium_priority.truck_id)
-low_priority.time_tracker.insert_current_truck(low_priority.truck_id)
+# high_priority.time_tracker.insert_current_truck(high_priority.truck_id)
+# medium_priority.time_tracker.insert_current_truck(medium_priority.truck_id)
+# low_priority.time_tracker.insert_current_truck(low_priority.truck_id)
 # Initialize packages
 high_priority.time_tracker.initialize_multiple_package_status(high_priority.get_packages(), 'AT_HUB', 1, 8.0)
 medium_priority.time_tracker.initialize_multiple_package_status(medium_priority.get_packages(), 'AT_HUB', 2, 9.05)
@@ -744,10 +744,9 @@ sort_packages_on_truck(low_priority, graph_access)
 
 truck_list = [high_priority, medium_priority, low_priority]
 deliver_packages(truck_list, graph_access, '8:35', '9:25')
+deliver_packages(truck_list, graph_access, '9:35', '10:25')
 deliver_packages(truck_list, graph_access, '12:03', '1:12')
-# truck_list1 = [low_priority]
-# deliver_packages(truck_list1, graph_access)
-#
+
 # for package, status_info in filtered_packages:
 #     print(f"Package ID: {package.package_id} - Address: {package.address} - Status: {status_info}")
 # print("HIGH_PRIORITY WITH CONSTRAINTS: ", "COUNT: ", high_priority.get_package_count())

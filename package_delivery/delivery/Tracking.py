@@ -5,20 +5,10 @@ from package_delivery.data_structures.HashMap import HashMapEntry
 
 class TimeTracker:
     def __init__(self):
-        # # Start time at 8:00 AM
-        self.overall_current_time = 8.0
-        # End time at 5:00 PM
-        self.overall_end_time = 17.0
         # Trucks_speed 18mph -> 0.3 miles per minute
         self.truck_speed = 0.3
         # Dictionary to track current_time for each truck
         self.track_truck_current_time = {}
-        # # Required time intervals to track status of all packages
-        # self.tracking_intervals = [
-        #     (8.35, 9.25),
-        #     (9.35, 10.25),
-        #     (12.03, 13.12)
-        # ]
         # Dictionary of packages on truck and their status; AT_HUB, IN_TRANSIT, or DELIVERED
         self.packages_status = {}
         # Dictionary to track miles traveled by each truck
@@ -247,6 +237,15 @@ class TimeTracker:
 
     # Print package_status of all packages to 'DELIVERED' after they are delivered
     def print_delivered_status(self, truck_id):
+        """
+        Prints the delivered status of packages for a given truck.
+
+        Args:
+            truck_id (int): The ID of the truck.
+
+        Returns:
+            str: A string containing the delivered status of packages.
+        """
         current_time = self.track_truck_current_time[truck_id]
         formatted_current = TimeTracker.format_time(current_time)
         delivered_packages_by_destination = {}
@@ -260,43 +259,37 @@ class TimeTracker:
                 else:
                     delivered_packages_by_destination[destination].append(package_id)
 
-        print("Packages delivered:")
+        result = "Packages delivered:\n"
         for destination, package_ids in delivered_packages_by_destination.items():
-            print("Destination:", destination, end=" ")
-            print("Package IDs:", package_ids)
-        print("DELIVERY_TIME:", formatted_current)
+            result += f"Destination: {destination} Package IDs: {package_ids}\n"
+        result += f"DELIVERY_TIME: {formatted_current}"
+        return result
 
     # Dynamically update status of packages to 'IN_TRANSIT' and 'DELIVERED' as the truck travels
-    def filter_packages_by_time_range(self, start_interval, end_interval, ):
-        filtered_packages = {}
-        packages_to_update = []
+    # Should not hard-code the package status to 'IN_TRANSIT' and 'DELIVERED' to avoid errors
+    def filter_packages_by_time_range(self, start_interval, end_interval):
+        """
+        Filter packages by time range.
+        """
+        filtered_packages = []
 
         start_time = datetime.strptime(start_interval, '%H:%M').time()
         end_time = datetime.strptime(end_interval, '%H:%M').time()
 
         for package, status_info in self.packages_status.items():
             time_delivered_str = status_info['time_delivered']
-            if time_delivered_str:
+            try:
                 time_delivered = datetime.strptime(time_delivered_str, '%H:%M').time()
                 if start_time <= time_delivered <= end_time or time_delivered < start_time:
-                    # status_info['status'] = 'DELIVERED'
-                    packages_to_update.append(package)
-                    filtered_packages[package.package_id] = status_info
+                    status_info_copy = status_info.copy()
+                    status_info_copy['status'] = 'DELIVERED'
+                    filtered_packages.append(status_info_copy)
                 elif time_delivered > end_time:
-                    # status_info['status'] = 'IN_TRANSIT'
-                    packages_to_update.append(package)
-                    filtered_packages[package] = status_info
+                    status_info_copy1 = status_info.copy()
+                    status_info_copy1['status'] = 'IN_TRANSIT'
+                    filtered_packages.append(status_info_copy1)
+            except ValueError as e:
+                print(f"Error parsing time for package {package}: {e}, time_delivered: {time_delivered}")
 
-        # Update the status of the packages outside of the loop
-        for package in packages_to_update:
-            status_info = self.packages_status[package]
-            time_delivered_str = status_info['time_delivered']
-            time_delivered = datetime.strptime(time_delivered_str, '%H:%M').time()
-            if start_time <= time_delivered <= end_time or time_delivered < start_time:
-                status_info['status'] = 'DELIVERED'
-                filtered_packages[package.package_id] = status_info
-            elif time_delivered > end_time:
-                status_info['status'] = 'IN_TRANSIT'
-                filtered_packages[package.package_id] = status_info
         print("FILTERED_PACKAGE COUNT:", len(filtered_packages))
         return filtered_packages
