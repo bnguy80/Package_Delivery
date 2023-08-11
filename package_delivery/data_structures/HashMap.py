@@ -1,5 +1,4 @@
 import csv
-import os
 
 
 # Individual packages with their delivery relevant information to be represented as HashMap entries
@@ -7,6 +6,42 @@ import os
 class HashMapEntry:
 
     def __init__(self, package_id, address, city, state, zipcode, delivery_deadline, mass, special_notes):
+        """
+        Initialize a package object.
+
+        Args:
+            package_id (int): The ID of the package.
+            address (str): The address of the package.
+            city (str): The city of the package.
+            state (str): The state of the package.
+            zipcode (str): The zipcode of the package.
+            delivery_deadline (str): The delivery deadline of the package.
+            mass (str): The mass of the package.
+            special_notes (str): Any special notes for the package.
+
+        Raises:
+            TypeError: If any of the arguments have an invalid type.
+
+        Returns:
+            None
+        """
+        if not isinstance(package_id, int):
+            raise TypeError('Package ID must be an integer')
+        if not isinstance(address, str):
+            raise TypeError('Address must be a string')
+        if not isinstance(city, str):
+            raise TypeError('City must be a string')
+        if not isinstance(state, str):
+            raise TypeError('State must be a string')
+        if not isinstance(zipcode, str):
+            raise TypeError('Zipcode must be a string')
+        if not isinstance(delivery_deadline, str):
+            raise TypeError('Delivery deadline must be a string')
+        if not isinstance(mass, str):
+            raise TypeError('Mass must be a string')
+        if not isinstance(special_notes, str):
+            raise TypeError('Special notes must be a string')
+
         self.package_id = package_id
         self.address = address
         self.city = city
@@ -77,16 +112,16 @@ class HashMap:
         bucket_list = self.map[bucket]
 
         if bucket_list is not None:
-            for pair in bucket_list:
-                if pair[0] == key:
-                    return pair[1].address
+            for key_value_pair in bucket_list:
+                if key_value_pair[0] == key:
+                    return key_value_pair[1].address
             return None
 
     def get_key_from_address(self, address):
         for bucket in self.map:
-            for pair in bucket:
-                if pair[1].address == address:
-                    return pair[0]
+            for key_value_pair in bucket:
+                if key_value_pair[1].address == address:
+                    return key_value_pair[0]
         return None
 
     def get_hashmap(self):
@@ -120,10 +155,10 @@ class HashMap:
             for pairs in bucket_list:
                 if pairs[0] == key:  # Find the key-value pair and update if found
                     pairs[1] = value
-                    print(pairs[1])
+                    print(f"Updated value: {pairs[1]}")
                     return True
         else:
-            print("Error updating package with key:" + key)
+            print(f"Error updating package with key: {key}")
 
     # Find key-value pair to delete
     def delete(self, key):
@@ -144,37 +179,42 @@ class HashMap:
 
 # Load Hash Map object with the values from csv file
 def load_hash_map(fileName):
+    """
+    Load data from a CSV file into a hash map.
+
+    Args:
+        fileName (str): The name of the CSV file.
+
+    Returns:
+        HashMap: The hash map containing the loaded data.
+    """
     insert_into_hash_map = HashMap()
-    with open(fileName) as csv_file:
-        csv_reader = csv.reader(csv_file)
+    try:
+        with open(fileName) as csv_file:
+            csv_reader = csv.reader(csv_file)
 
-        for package in csv_reader:
-            package_id = int(package[0])
-            address = package[1]
-            city = package[2]
-            state = package[3]
-            zipcode = package[4]
-            delivery_deadline = package[5]
-            mass = package[6]
-            special_notes = package[7]
+            for package in csv_reader:
+                try:
+                    package_id = int(package[0])
+                    address = package[1]
+                    city = package[2]
+                    state = package[3]
+                    zipcode = package[4]
+                    delivery_deadline = package[5]
+                    mass = package[6]
+                    special_notes = package[7]
 
-            # Key to directly hash
-            key = package_id
+                    # Key to directly hash
+                    key = package_id
 
-            # HashMapEntry object
-            value = HashMapEntry(package_id, address, city, state, zipcode, delivery_deadline, mass, special_notes)
-            insert_into_hash_map.insert(key, value)
-            # value of csv file being printed correctly when calling values
-            # print(value)
+                    # HashMapEntry object
+                    value = HashMapEntry(package_id, address, city, state, zipcode, delivery_deadline, mass, special_notes)
+                    insert_into_hash_map.insert(key, value)
+                except Exception as e:
+                    print(f"Error occurred while processing package: {e}")
+    except Exception as e:
+        print(f"Error occurred while loading hash map: {e}")
 
-            # print(insert_into_hash_map.ge) #as readable format, using for test all values
-            # want to append to empty array to show all
-            # hashMap = [HashMapEntry(f"ID: {package[0]}", f"Address: {package[1]}", f"City: {package[2]}",
-            #                         f"State: {package[3]}", f"Zipcode: {package[4]}", f"Delivery: {package[5]}",
-            #                         f"Mass: {package[6]}", f"Special: {package[7]}")]
-
-            # Human-readable format showing attributes inside the object HashMapEntry
-            # print(hashMap)
     return insert_into_hash_map
 
 
@@ -184,7 +224,7 @@ def get_hash_map_all():
         print(package_hashmap.get_value_from_key(i))
 
 
-# Check if all packages exist in HashMap object
+# Check if all packages exist in HashMap object for testing purposes
 def check_all_packages(hashmap, total_packages=40):
     for package_id in range(1, total_packages + 1):
         if hashmap.get_value_from_key(package_id) is None:
@@ -193,7 +233,9 @@ def check_all_packages(hashmap, total_packages=40):
 
 
 # Hash Map object instance to insert into HashMap
-package_hashmap = load_hash_map('WGUPS Package File Formatted.csv')
+package_hashmap = load_hash_map(r'C:\Users\brand\IdeaProjects\Package_Delivery_Program_New\package_delivery\data_structures\WGUPS Package File Formatted.csv')
+
+
 # print(sorted(package_hashmap.get_packages(), key=lambda x: x[0], reverse=True))
 
 # all_packages_exist = check_all_packages(package_hashmap)

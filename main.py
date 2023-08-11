@@ -11,48 +11,26 @@ def load_packages_submenu():
     while True:
         sub_menu = input(
             "[0] Exit\n"
-            "[1] Load packages onto trucks\n"
-            "[2] Sort packages and optimize route\n"
-
+            "[1] Load packages onto trucks?\n"
         )
         if sub_menu == "0":
             print("Returning to main menu")
             break
         elif sub_menu == "1":
+            print("Truck1, optimized route:", high_priority.route)
+            high_priority.time_tracker.print_package_status()
             print("Truck1, Number of packages: ", high_priority.get_package_count())
             high_priority.print_packages()
             print("\n")
+            print("Truck2, optimized route:", medium_priority.route)
+            medium_priority.time_tracker.print_package_status()
             print("Truck2, Number of packages: ", medium_priority.get_package_count())
             medium_priority.print_packages()
             print("\n")
-            print("Truck3, Number of packages: ", low_priority.get_package_count())
-            # low_priority.print_packages()
-            # # Initialize all packages loaded onto trucks status to 'AT_HUB'
-            # high_packages = high_priority.get_packages()
-            # medium_packages = medium_priority.get_packages()
-            # low_packages = low_priority.get_packages()
-            # high_priority.time_tracker.initialize_multiple_package_status(high_packages, 'AT_HUB', 1, 8.0)
-            # medium_priority.time_tracker.initialize_multiple_package_status(medium_packages, 'AT_HUB', 2, 9.05)
-            # low_priority.time_tracker.initialize_multiple_package_status(low_packages, 'AT_HUB', 3, 8.0)
-            # # Initialize tracking of trucks and packages
-            # high_priority.time_tracker.insert_current_truck(high_priority.truck_id)
-            # medium_priority.time_tracker.insert_current_truck(medium_priority.truck_id)
-            # low_priority.time_tracker.insert_current_truck(low_priority.truck_id)
-            print("\n")
-        elif sub_menu == "2":
-            # Trucks.sort_packages_on_truck(high_priority, graph_access)
-            # Trucks.sort_packages_on_truck(medium_priority, graph_access)
-            # Trucks.sort_packages_on_truck(low_priority, graph_access)
-            # Trucks.two_opt_route(high_priority, graph_access)
-            # Trucks.two_opt_route(medium_priority, graph_access)
-            # Trucks.two_opt_route(low_priority, graph_access)
-            print("Truck1, optimized route:", high_priority.route)
-            high_priority.time_tracker.print_package_status()
-            print("Truck2, optimized route:", medium_priority.route)
-            medium_priority.time_tracker.print_package_status()
             print("Truck3, optimized route:", low_priority.route)
             low_priority.time_tracker.print_package_status()
-            break
+            print("Truck3, Number of packages: ", low_priority.get_package_count())
+            low_priority.print_packages()
 
 
 def delivery_submenu():
@@ -60,14 +38,14 @@ def delivery_submenu():
     while True:
         sub_menu = input(
             "[0] Exit\n"
-            "[1] Start delivery and see status\n"
+            "[1] Start delivery and see status?\n"
         )
         if sub_menu == "0":
             print("Returning to main menu")
             break
         if sub_menu == "1":
-            start_interval = input("Enter start interval (e.g., '9:35'): ")
-            end_interval = input("Enter end interval (e.g., '10:25'): ")
+            start_interval = input("Enter start interval (e.g., '8:25', '9:35', '12:03'): ")
+            end_interval = input("Enter end interval (e.g., '9:25', '10:25', '1:12'): ")
             Trucks.deliver_packages(trucks_list, graph_access, start_interval, end_interval)
 
 
