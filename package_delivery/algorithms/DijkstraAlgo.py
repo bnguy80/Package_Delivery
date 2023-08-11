@@ -1,6 +1,8 @@
 import heapq
 import math
 
+from package_delivery.data_structures.AdjacencyMatrix import graph_access
+
 
 # src-> Hub to start all deliveries from
 # min_heap as priority queue to find minimum-distance neighbor, greedy approach: find min_distance
@@ -98,8 +100,8 @@ def print_distances_and_pred_vertex(distances, pred_vertex):
 
 
 # target1 = '1060 Dalton Ave S'
-# distances1, pred_vertex1 = dijkstra(graph_access, '4001 South 700 East', '5383 South 900 East #104')
-# print("DISTANCES-DIJKSTRA, PRED_VERTEX == ", distances1, pred_vertex1)
+distances1, pred_vertex1 = dijkstra(graph_access, '4001 South 700 East')
+print("DISTANCES-DIJKSTRA, PRED_VERTEX == ", distances1, pred_vertex1)
 # print(reconstruct_path(pred_vertex1,  target1))
 # print_distances_and_path(distances1, pred_vertex1, '1060 Dalton Ave S')
 # print(graph.vertices)

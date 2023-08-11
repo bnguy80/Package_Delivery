@@ -233,7 +233,7 @@ def check_all_packages(hashmap, total_packages=40):
 
 
 # Hash Map object instance to insert into HashMap
-package_hashmap = load_hash_map('../WGUPS Package File Formatted.csv')
+package_hashmap = load_hash_map(r'C:\Users\brand\IdeaProjects\Package_Delivery_Program_New\package_delivery\data_structures\WGUPS Package File Formatted.csv')
 
 
 # print(sorted(package_hashmap.get_packages(), key=lambda x: x[0], reverse=True))
