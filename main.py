@@ -1,6 +1,6 @@
 from package_delivery.delivery import Trucks
 from package_delivery.delivery.Trucks import high_priority, medium_priority, low_priority
-from package_delivery.data_structures.AdjacencyMatrix import graph_access
+from package_delivery.data_structures.Adjacency_List import graph_access
 from package_delivery.data_structures import HashMap
 from package_delivery.data_structures.HashMap import package_hashmap
 

@@ -289,7 +289,7 @@ class TimeTracker:
                     status_info_copy1['status'] = 'IN_TRANSIT'
                     filtered_packages.append(status_info_copy1)
             except ValueError as e:
-                print(f"Error parsing time for package {package}: {e}, time_delivered: {time_delivered}")
+                print(f"Error parsing time for package {package}: {e}, time_delivered: {0}")
 
         print("FILTERED_PACKAGE COUNT:", len(filtered_packages))
         return filtered_packages

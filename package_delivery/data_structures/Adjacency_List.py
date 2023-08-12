@@ -167,7 +167,8 @@ def print_package_deadline_asc(graph, delivery_deadline):
                 print()
 
 
-graph_access = load_graph(r'C:\Users\brand\IdeaProjects\Package_Delivery_Program_New\package_delivery\data_structures\WGUPS_distances.csv')
+graph_access = load_graph(r'C:\Users\brand\IdeaProjects\Package_Delivery_Program_New\package_delivery\data_structures'
+                          r'\WGUPS_distances.csv')
 # graph_access.insert_packages_vertex_associate(package_hashmap)
 graph_access.insert_packages_vertex_associate(package_hashmap)
 
