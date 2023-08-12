@@ -10,7 +10,7 @@ def two_opt_swap(route, i, j):
     Returns:
         list: A new list of vertices with the order of vertices between indices i and j reversed.
     """
-    new_route = route[:i] + list(reversed(route[i:j + 1])) + route[j + 1:]
+    new_route = route[:i] + route[i:j + 1][::-1] + route[j + 1:]
     return new_route
 
 
@@ -34,8 +34,6 @@ def remove_repeated_vertices(route):
     Returns:
         list: A copy of the route list with repeated vertices removed.
     """
-    # Start from the hub
-    hub_vertex = '4001 South 700 East'
     # Create new list with first vertex from current route
     unique_route = [route[0]]
     for vertex in route:
@@ -52,7 +50,7 @@ def remove_repeated_vertices(route):
 # Starts at the hub, 4001 South 700 East, and ends at the hub
 def two_opt_route(trucks, graph):
     """
-    Optimize the route of trucks using the 2-opt algorithm.
+    Optimize the route even further after nearest-neighbor algorithm of trucks using the 2-opt algorithm.
 
     Args:
         trucks (Truck): The trucks to optimize.
@@ -61,12 +59,10 @@ def two_opt_route(trucks, graph):
     Returns:
         None
     """
-    # Start from the hub
-    hub_vertex = '4001 South 700 East'
-    # Only unique address on the route list
-    unique_route = remove_repeated_vertices(trucks.route)
+    # Only unique address on the route list (excluding hub)
+    unique_route = [vertex for vertex in remove_repeated_vertices(trucks.route) if vertex != '4001 South 700 East']
     # Initialize the unique_route to the current_route
-    current_route = unique_route
+    current_route = ['4001 South 700 East'] + unique_route + ['4001 South 700 East']
     # Will be best optimized route
     best_route = current_route
     improvement = True
@@ -76,13 +72,10 @@ def two_opt_route(trucks, graph):
         # Calculate distance of current_route
         best_distance = calculate_route_distance(current_route, graph)
         # Iterate through each vertex in the route except the first and last
-        for i in range(1, len(current_route) - 1):
-            for j in range(i + 1, len(current_route)):
+        for i in range(1, len(current_route) - 2):
+            for j in range(i + 1, len(current_route) - 1):
 
-
-                #  # Create new route with the hub at the beginning and end of the segment to be swapped
-                new_route = [hub_vertex] + two_opt_swap(current_route, i, j) + [hub_vertex]
-
+                new_route = two_opt_swap(current_route, i, j)
 
                 # Calculate distance of new_route
                 new_distance = calculate_route_distance(new_route, graph)
@@ -96,7 +89,7 @@ def two_opt_route(trucks, graph):
         # print("BEST_ROUTE: ", current_route)
     # Update the truck's route with the optimized route
     trucks.route = best_route
-    # print("BEST_ROUTE: ", best_route)
+    # print("TWO-OPT ROUTE: ", best_route)
     # Optimize the order of packages to reflect the optimized route
     optimized_packages = []
     for address in current_route:
@@ -105,6 +98,4 @@ def two_opt_route(trucks, graph):
                 optimized_packages.append(package)
                 break
     trucks.packages = optimized_packages
-    print("TRUCK: ", trucks.truck_id, " OPTIMIZED_ROUTE TWO-OPT: ", trucks.route)
-
-
+    # print("TRUCK: ", trucks.truck_id, " OPTIMIZED_ROUTE TWO-OPT: ", trucks.route)
