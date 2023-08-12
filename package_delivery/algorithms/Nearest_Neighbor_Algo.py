@@ -7,25 +7,6 @@
 import math
 
 
-# Find the nearest package to the current vertex on the truck and return it as a package object
-def find_nearest_package(truck, current_vertex, graph):
-    # Initialize the minimum distance to infinity and the nearest package to None
-    min_distance = math.inf
-    nearest_package = None
-    # For each package on the truck find the nearest package to the current vertex
-    for package in truck.get_packages():
-        dest_vertex = package.address
-        # Calculate the distance between the current vertex and the destination vertex by looking up the distance in
-        # the graph object using the current vertex and destination vertex as keys
-        distance = graph.edge_weight[current_vertex][dest_vertex]
-        # If the distance is less than the minimum distance, update the minimum distance and nearest package
-        if distance < min_distance:
-            min_distance = distance
-            nearest_package = package
-
-    return nearest_package
-
-
 # Sort the packages on the truck using the nearest neighbor algorithm and update the truck's route with the sorted route
 def sort_packages_on_truck(trucks, graph):
     # Start from the hub
@@ -35,10 +16,25 @@ def sort_packages_on_truck(trucks, graph):
     # Initialize the sorted route with the hub vertex
     sorted_route = [current_vertex]
 
+    # Get the packages on the truck
+    packages = trucks.get_packages()
+
     # While there are still packages on the truck
-    while len(trucks.get_packages()) > 0:
-        # Find the nearest package to the current vertex
-        nearest_package = find_nearest_package(trucks, current_vertex, graph)
+    while len(packages) > 0:
+        # Initialize the minimum distance to infinity and the nearest package to None
+        min_distance = math.inf
+        nearest_package = None
+        # For each package on the truck find the nearest package to the current vertex by calculating the distance
+        # between the current vertex and the destination vertex of the package
+        for package in packages:
+            dest_vertex = package.address
+            # Calculate the distance between the current vertex and the destination vertex by looking up the distance in
+            # the graph object using the current vertex and destination vertex as keys
+            distance = graph.edge_weight[current_vertex][dest_vertex]
+            # If the distance is less than the minimum distance, update the minimum distance and nearest package
+            if distance < min_distance:
+                min_distance = distance
+                nearest_package = package
 
         # Move to the nearest package and mark it as loaded on the truck and its route
         if nearest_package:
@@ -47,12 +43,13 @@ def sort_packages_on_truck(trucks, graph):
             sorted_route.append(nearest_package.address)
             # Update the current vertex to the nearest package's address
             current_vertex = nearest_package.address
-            # Remove the nearest package from the truck and its route list of packages and addresses respectively
-            trucks.remove_packages(nearest_package)
+            # Remove the nearest package from the packages variable
+            packages.remove(nearest_package)
+
     # After all deliveries, return to the hub
     sorted_route.append(hub_vertex)
     trucks.packages = sorted_packages
     trucks.route = sorted_route
-    print()
-    print("SORTED_ROUTE: ", sorted_route)
-    print()
+    # print()
+    # print("SORTED_ROUTE: ", sorted_route)
+    # print()
