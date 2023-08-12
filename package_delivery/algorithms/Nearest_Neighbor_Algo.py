@@ -1,5 +1,5 @@
-# Implement the nearest neighbor algorithm, brute force approach, optimize the order of addresses in route in
-# starting from the hub, 4001 South 700 East, and ending at the hub
+# Implement the nearest neighbor algorithm, brute force approach, optimize the order of addresses in route
+# Starting from the hub, 4001 South 700 East, and ending at the hub
 # sort the order of the packages loaded on Trucks object after loading the packages;
 # this creates an initial route when calling the 'find_shortest_route_to_deliver'
 # function that where we implement dijkstra's algorithm

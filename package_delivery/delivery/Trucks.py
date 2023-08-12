@@ -413,16 +413,16 @@ def find_shortest_route_to_deliver(truck, graph):
             total_distance += total
         # Update start_vertex1 to the dest_vertex1 for the next iteration
         start_vertex1 = dest_vertex
-    # Route of last package back to hub
-    optimized_route_back_to_hub = find_optimized_route_back_to_hub(pred_vertex_copy, start_vertex1,
-                                                                   '4001 South 700 East')
-    # Calculate the distance of the optimized route back to the hub
-    for i in range(len(optimized_route_back_to_hub)):
-        from_vertex = optimized_route_back_to_hub[i]
-        distances1, _ = dijkstra(graph_access, from_vertex, truck.route)
-        total = distances1[from_vertex]
-        total_distance += total
-    total_distance = round(total_distance, 2)
+    # # Route of last package back to hub
+    # optimized_route_back_to_hub = find_optimized_route_back_to_hub(pred_vertex_copy, start_vertex1,
+    #                                                                '4001 South 700 East')
+    # # Calculate the distance of the optimized route back to the hub
+    # for i in range(len(optimized_route_back_to_hub)):
+    #     from_vertex = optimized_route_back_to_hub[i]
+    #     distances1, _ = dijkstra(graph_access, from_vertex, truck.route)
+    #     total = distances1[from_vertex]
+    #     total_distance += total
+    # total_distance = round(total_distance, 2)
 
     return total_distance
 
@@ -480,12 +480,12 @@ def deliver_packages(trucks, graph, start_interval, end_interval):
         # Check if current truck is ready for delivery
         if current_truck.time_tracker.is_ready_to_deliver(current_truck):
             # Only print the route if the current truck is truck1 or truck2
-            if current_truck == high_priority or current_truck == medium_priority:
-                print(f"{truck_name}, OPTIMIZED_DELIVERY_ROUTE: ", current_truck.route)
-                optimized_route_back_to_hub = find_optimized_route_back_to_hub(
-                    current_truck.pred_vertex, current_truck.route[-1], '4001 South 700 East'
-                )
-                print("BACK_TO_HUB:", optimized_route_back_to_hub)
+            # if current_truck == high_priority or current_truck == medium_priority:
+            #     print(f"{truck_name}, OPTIMIZED_DELIVERY_ROUTE: ", current_truck.route)
+            #     optimized_route_back_to_hub = find_optimized_route_back_to_hub(
+            #         current_truck.pred_vertex, current_truck.route[-1], '4001 South 700 East'
+            #     )
+            #     print("BACK_TO_HUB:", optimized_route_back_to_hub)
             # Only deliver packages if the current truck is truck1 or truck2
             if current_truck == high_priority or current_truck == medium_priority:
                 # Call the function two_opt_route to find the optimized route for the current truck
@@ -521,6 +521,7 @@ def deliver_packages(trucks, graph, start_interval, end_interval):
                                                                                              end_interval)
                 print("Start time:", start_interval, "End time:", end_interval)
                 print("FILTERED_PACKAGES:", filtered_packages)
+                print("TRUCK ROUTE:", current_truck.route)
                 time_tracker.print_miles_traveled(current_truck.truck_id)
 
 
@@ -539,11 +540,11 @@ def deliver_truck3_packages(truck3, graph, start_interval, end_interval):
     time_tracker.update_time_to_start_delivery(truck3.truck_id, truck3_start_time)
 
     print("Truck 3: Starting deliveries.")
-    print(f"{truck_name}, OPTIMIZED_DELIVERY_ROUTE: ", truck3.route)
-    optimized_route_back_to_hub = find_optimized_route_back_to_hub(
-        truck3.pred_vertex, truck3.route[-1], '4001 South 700 East'
-    )
-    print("BACK_TO_HUB:", optimized_route_back_to_hub)
+    # print(f"{truck_name}, OPTIMIZED_DELIVERY_ROUTE: ", truck3.route)
+    # optimized_route_back_to_hub = find_optimized_route_back_to_hub(
+    #     truck3.pred_vertex, truck3.route[-1], '4001 South 700 East'
+    # )
+    # print("BACK_TO_HUB:", optimized_route_back_to_hub)
     # Call the function two_opt_route to find the optimized route for truck 3
     two_opt_route(truck3, graph)
     # Call the function to find the shortest route to deliver packages
@@ -559,31 +560,31 @@ def deliver_truck3_packages(truck3, graph, start_interval, end_interval):
 
 
 # Find route back to hub from last package.address delivered
-def find_optimized_route_back_to_hub(predecessor_vertices, destination_vertex, hub_vertex):
-    """
-    Find the optimized route back to the hub.
-
-    Args:
-        predecessor_vertices (list): The list of predecessor vertices.
-        destination_vertex (str): The destination vertex.
-        hub_vertex (str): The hub vertex.
-
-    Returns:
-        list: The optimized route back to the hub.
-    """
-    efficient_route = []
-    current_vertex = destination_vertex
-    while current_vertex != hub_vertex:
-        efficient_route.append(current_vertex)
-        # No route to hub_vertex, terminate the loop
-        if current_vertex not in predecessor_vertices:
-            break
-        current_vertex = predecessor_vertices[current_vertex]
-    # In case the last element of efficient_route is None, don't include it in the route
-    if efficient_route and efficient_route[-1] is None:
-        efficient_route.pop()
-    efficient_route.append(hub_vertex)
-    return efficient_route
+# def find_optimized_route_back_to_hub(predecessor_vertices, destination_vertex, hub_vertex):
+#     """
+#     Find the optimized route back to the hub.
+#
+#     Args:
+#         predecessor_vertices (list): The list of predecessor vertices.
+#         destination_vertex (str): The destination vertex.
+#         hub_vertex (str): The hub vertex.
+#
+#     Returns:
+#         list: The optimized route back to the hub.
+#     """
+#     efficient_route = []
+#     current_vertex = destination_vertex
+#     while current_vertex != hub_vertex:
+#         efficient_route.append(current_vertex)
+#         # No route to hub_vertex, terminate the loop
+#         if current_vertex not in predecessor_vertices:
+#             break
+#         current_vertex = predecessor_vertices[current_vertex]
+#     # In case the last element of efficient_route is None, don't include it in the route
+#     if efficient_route and efficient_route[-1] is None:
+#         efficient_route.pop()
+#     efficient_route.append(hub_vertex)
+#     return efficient_route
 
 
 # Delivered by 9:00am, constraint of having multiple packages on same truck delivered together, Truck 1
