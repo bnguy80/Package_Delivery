@@ -70,7 +70,7 @@ class HashMap:
         return bucket
 
     # Insert new packages into hash Map
-    def insert(self, key, value):
+    def insert_package(self, key, value):
         bucket = self._get_hash(key)  # Get bucket
         bucket_list = self.map[bucket]  # Get bucket list where item will go
         key_value = [key, value]  # Key-entry pair
@@ -147,7 +147,7 @@ class HashMap:
             print("=" * 40)
 
     # To update value in key-value pair if changed
-    def update(self, key, value):
+    def update_value(self, key, value):
         bucket = self._get_hash(key)
         bucket_list = self.map[bucket]
 
@@ -161,7 +161,7 @@ class HashMap:
             print(f"Error updating package with key: {key}")
 
     # Find key-value pair to delete
-    def delete(self, key):
+    def delete_key_value(self, key):
         bucket = self._get_hash(key)
         bucket_list = self.map[bucket]
 
@@ -209,7 +209,7 @@ def load_hash_map(fileName):
 
                     # HashMapEntry object
                     value = HashMapEntry(package_id, address, city, state, zipcode, delivery_deadline, mass, special_notes)
-                    insert_into_hash_map.insert(key, value)
+                    insert_into_hash_map.insert_package(key, value)
                 except Exception as e:
                     print(f"Error occurred while processing package: {e}")
     except Exception as e:

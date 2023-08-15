@@ -14,10 +14,9 @@ class TimeTracker:
         # Dictionary to track miles traveled by each truck
         self.track_miles_traveled = {}
 
-        # Helper function to convert delivery_time to a comparable format
-
+    # Helper function to convert delivery_time to a comparable format
     @staticmethod
-    def convert_to_time(delivery_deadline):
+    def convert_deadline_time(delivery_deadline):
         if delivery_deadline == 'EOD':
             return datetime.strptime('5:00 PM', '%I:%M %p')
         else:
@@ -102,7 +101,7 @@ class TimeTracker:
     # Associate all packages with their truck they are loaded onto
     def initialize_multiple_package_status(self, packages, initial_status, truck_id, time_loaded):
         for package in packages:
-            delivery_deadline = self.convert_to_time(package.delivery_deadline)
+            delivery_deadline = self.convert_deadline_time(package.delivery_deadline)
             formatted_delivery_time = delivery_deadline.strftime('%H:%M')  # Format to 24-hour format
             if package not in self.packages_status:
                 self.packages_status[package] = {

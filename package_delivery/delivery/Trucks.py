@@ -1,7 +1,7 @@
 
 from package_delivery.algorithms.Nearest_Neighbor_Algo import sort_packages_on_truck
 from package_delivery.algorithms.Two_Opt_Route import two_opt_route
-from package_delivery.data_structures.Adjacency_List import graph_access
+from package_delivery.data_structures.Graph import graph_access
 from package_delivery.algorithms.DijkstraAlgo import dijkstra
 from package_delivery.data_structures.HashMap import package_hashmap
 from package_delivery.delivery.Tracking import TimeTracker
@@ -356,21 +356,16 @@ def left_over_packages(graph, track_package_id):
 def load_left_over_packages(trucks, left_over, track_package_id):
     for package_list in left_over:
         for package_left in package_list:
-            # Check if any of the trucks already have the same address package loaded
-            # Check if the package_left.address matches the already loaded packages in any of the trucks
             found_in_truck = False
-            for package in trucks.get_packages():
-                if package_left.address == package.address:
-                    found_in_truck = True
-                    break
-            # If the package_left.address match is found in any trucks, load it onto the non-full trucks
-            if found_in_truck:
+            if len(trucks.get_packages()) < 16:
                 for package in trucks.get_packages():
-                    # same_address_packages = [p for p in trucks.get_packages() if p.address == package.address]
-                    if len(trucks.get_packages()) < 16:
-                        trucks.insert_packages(package_left)
-                        track_package_id.add(package_left.package_id)
+                    if package_left.address == package.address:
+                        found_in_truck = True
                         break
+                if found_in_truck:
+                    trucks.insert_packages(package_left)
+                    track_package_id.add(package_left.package_id)
+                    break
 
 
 # Calculate the shortest route to deliver packages to destination
