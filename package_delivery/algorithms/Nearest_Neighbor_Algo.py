@@ -53,3 +53,6 @@ def sort_packages_on_truck(trucks, graph):
     # print()
     # print("SORTED_ROUTE: ", sorted_route)
     # print()
+
+
+
