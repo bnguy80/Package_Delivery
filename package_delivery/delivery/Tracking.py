@@ -62,6 +62,28 @@ class TimeTracker:
     def get_all_package_status(self):
         return self.packages_status
 
+    # Lookup package status by package_id and current_time to determine if package is delivered or in transit
+    def lookup_package_status(self, package_id, current_time):
+        before_load = datetime.strptime('8:00', '%H:%M').time()
+        current_time = datetime.strptime(current_time, '%H:%M').time()
+        for package, status_info in self.packages_status.items():
+            if package.package_id == package_id:
+                time_delivered_str = status_info['time_delivered']
+                time_delivered = datetime.strptime(time_delivered_str, '%H:%M').time()
+                status_info_copy = status_info.copy()
+                if current_time >= time_delivered and current_time >= before_load:
+                    status_info_copy['status'] = 'DELIVERED'
+                elif time_delivered > current_time >= before_load:
+                    status_info_copy['status'] = 'IN_TRANSIT'
+                elif current_time < before_load:
+                    status_info_copy['status'] = 'AT_HUB'
+
+                print("Package: ", package, " - Package Status: ", status_info_copy['status'],
+                      "Package Time Delivered: ", status_info_copy['time_delivered'])
+                return
+
+        print("Package not found")
+
     # Update package in package_status dictionary
 
     def update_package_status(self, package, new_address, new_city, new_state, new_zipcode, new_special_notes):
@@ -92,7 +114,7 @@ class TimeTracker:
         return False
 
     # See status of all packages during day
-    def print_package_status(self):
+    def print_all_package_status(self):
         print("Package Status:")
         for package, status in self.packages_status.items():
             print(package, self.packages_status[package])
@@ -282,11 +304,11 @@ class TimeTracker:
                 if start_time <= time_delivered <= end_time or time_delivered < start_time:
                     status_info_copy = status_info.copy()
                     status_info_copy['status'] = 'DELIVERED'
-                    filtered_packages.append(status_info_copy)
+                    filtered_packages.append([package, status_info_copy])
                 elif time_delivered > end_time:
                     status_info_copy1 = status_info.copy()
                     status_info_copy1['status'] = 'IN_TRANSIT'
-                    filtered_packages.append(status_info_copy1)
+                    filtered_packages.append([package, status_info_copy1])
             except ValueError as e:
                 print(f"Error parsing time for package {package}: {e}, time_delivered: {0}")
 
