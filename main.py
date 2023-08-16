@@ -1,6 +1,6 @@
 from package_delivery.delivery import Trucks
 from package_delivery.delivery.Trucks import high_priority, medium_priority, low_priority
-from package_delivery.data_structures.AdjacencyMatrix import graph_access
+from package_delivery.data_structures.Graph import graph_access
 from package_delivery.data_structures import HashMap
 from package_delivery.data_structures.HashMap import package_hashmap
 
@@ -18,17 +18,17 @@ def load_packages_submenu():
             break
         elif sub_menu == "1":
             print("Truck1, optimized route:", high_priority.route)
-            high_priority.time_tracker.print_package_status()
+            high_priority.time_tracker.print_all_package_status()
             print("Truck1, Number of packages: ", high_priority.get_package_count())
             high_priority.print_packages()
             print("\n")
             print("Truck2, optimized route:", medium_priority.route)
-            medium_priority.time_tracker.print_package_status()
+            medium_priority.time_tracker.print_all_package_status()
             print("Truck2, Number of packages: ", medium_priority.get_package_count())
             medium_priority.print_packages()
             print("\n")
             print("Truck3, optimized route:", low_priority.route)
-            low_priority.time_tracker.print_package_status()
+            low_priority.time_tracker.print_all_package_status()
             print("Truck3, Number of packages: ", low_priority.get_package_count())
             low_priority.print_packages()
 

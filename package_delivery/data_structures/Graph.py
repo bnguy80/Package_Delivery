@@ -68,24 +68,22 @@ class Graph:
                     self.vertices[package_package].append(package)
                 else:
                     self.vertices[package_package] = [package]
-        # Associate edge weight with each package_package
-        # for vertex1, edges in self.edge_weight.items():
-        #     for vertex2, weight in edges.items():
-        #         for package_package in self.vertices[vertex1]:
-        #             package_package.edge_weight = weight
-        #             # print(package_package)
 
-        # Associate edge weight with each package
         for address, packages in self.vertices.items():
             for package in packages:
+                if package.address in self.edge_weight:
+                    package.edge_weight = self.edge_weight[package.address]
+                    break
+            else:
                 for vertex1, edges in self.edge_weight.items():
                     for vertex2, weight in edges.items():
                         if package.address == vertex1 or package.address == vertex2:
                             package.edge_weight = weight
+                            break
 
 
 # Get data from WGUPS_distances in order to create edges between vertices
-def csv_vertex_distances(fileName):
+def get_csv_vertex_distances(fileName):
     csv_distances = []  # To get all data from WGUPS_distances.csv
     with open(fileName) as csv_file:
         csv_reader = csv.reader(csv_file)
@@ -99,12 +97,10 @@ def csv_vertex_distances(fileName):
 
 # Load graph with vertices and weights
 def load_graph(fileName):
-    data = csv_vertex_distances(fileName)
+    data = get_csv_vertex_distances(fileName)
     graph = Graph()
     for row in data:
         graph.add_vertex(row[1])  # Addresses will act as vertices
-        # print(row[1])
-    for row in data:
         for i in range(3, len(row)):  # 0-2 indexes are location_name, location_street, location_zip.
             vertex1 = row[1]
             vertex2 = data[i - 3][1]
@@ -115,7 +111,7 @@ def load_graph(fileName):
 
 # Print all vertices and weights in Edge: vertex1 -> vertex2, Weight: format
 # It iterates over the graph.edge_weight dictionary, which is functions like an adjacency list of the graph.
-def print_graph(graph):
+def print_graph_edge_weight(graph):
     # Iterates over each vertex to retrieve edges and weights
     for vertex1, edges in graph.edge_weight.items():
         # Inner loop, prints src vertex(vertex1),dest vertex(vertex2), and weight of the edge
@@ -125,19 +121,17 @@ def print_graph(graph):
 
 # Print edges in the graph and associated packages
 # Help visualize the edges in the graph along with the associated packages with each vertex
-def print_edge_packages_asc(graph):
-    for vertex1, edges in graph.edge_weight.items():  # Iterate over each vertex and its associated edges in the graph
-        for vertex2, weight in edges.items():  # Iterate over each adjacent vertex and its weight
-            print(f"Edge: {vertex1} -> {vertex2}, Weight: {weight}")  # Print the edge and its weight
-            if vertex1 in graph.vertices:  # Check if the vertex1 has associated packages
-                for package in graph.vertices[vertex1]:  # Iterate over each package associated with vertex1
-                    # print(f"   Associated Package: {package}")
-                    print(f"Edge: {vertex1} -> {vertex2}, Associated Package: {package}")
-            print()
+def print_edges_packages_asc(graph):
+    [print(f"Edge: {vertex1} -> {vertex2}, Weight: {weight}") for vertex1, edges in graph.edge_weight.items() for
+     vertex2, weight in edges.items()]
+    [print(f"Edge: {vertex1} -> {vertex2}, Associated Package: {package}") for vertex1, edges in
+     graph.edge_weight.items() for vertex2, weight in edges.items() if vertex1 in
+     graph.vertices for package in graph.vertices[vertex1]]
+    print()
 
 
-# Print the vertex and associated packages in a human-readable format
-def print_vertex_packages_asc(graph):
+# Print the vertices and associated packages in a human-readable format
+def print_vertices_packages_asc(graph):
     for vertex, packages in graph.vertices.items():
         print(f"Vertex: {vertex}")
         for package in packages:  # Key-value pair print
@@ -155,6 +149,8 @@ def print_vertex_packages_asc(graph):
 #         print()
 
 
+# Print package with specified delivery deadline
+# For testing purposes
 def print_package_deadline_asc(graph, delivery_deadline):
     for vertex, packages in graph.vertices.items():
         # print(f"Vertex: {vertex}")
@@ -167,7 +163,8 @@ def print_package_deadline_asc(graph, delivery_deadline):
                 print()
 
 
-graph_access = load_graph(r'C:\Users\brand\IdeaProjects\Package_Delivery_Program_New\package_delivery\data_structures\WGUPS_distances.csv')
+graph_access = load_graph(r'C:\Users\brand\IdeaProjects\Package_Delivery_Program_New\package_delivery\data_structures'
+                          r'\WGUPS_distances.csv')
 # graph_access.insert_packages_vertex_associate(package_hashmap)
 graph_access.insert_packages_vertex_associate(package_hashmap)
 
@@ -192,3 +189,4 @@ graph_access.insert_packages_vertex_associate(package_hashmap)
 
 # 7/25/23: All 40 packages associated correctly with their vertex(address)
 # print(graph_access.edge_weight)
+
