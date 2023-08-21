@@ -4,7 +4,9 @@ from package_delivery.algorithms.Two_Opt_Route import two_opt_route
 from package_delivery.data_structures.Graph import graph_access
 from package_delivery.algorithms.DijkstraAlgo import dijkstra
 from package_delivery.data_structures.HashMap import package_hashmap
-from package_delivery.delivery.Load_Packages import get_left_over_packages, load_left_over_packages
+from package_delivery.delivery.Load_Packages import get_left_over_packages
+from package_delivery.delivery.Load_Packages import load_left_over_packages
+from package_delivery.delivery.Load_Packages import load_packages
 from package_delivery.delivery.Load_Tracking import track_package_id1
 from package_delivery.delivery.Tracking import TimeTracker
 
@@ -147,7 +149,7 @@ def load_trucks(truck_high_priority, truck_medium_priority, truck_low_priority, 
     # Trucks.set_edge_weight(truck_low_priority)
 
     # Load packages onto trucks using nearest neighbor algorithm
-    trucks = [truck_high_priority, truck_medium_priority, truck_low_priority]
+    trucks = [truck_low_priority, truck_medium_priority, truck_high_priority]
     load_packages_nearest_neighbor(trucks, graph, track_package_id)
 
     # After loading packages to satisfy constraints
