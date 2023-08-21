@@ -1,18 +1,77 @@
-# Get all packages to load on truck in order of nearest neighbor algorithm
 import random
 
 
-def get_randomized_packages_to_load(graph, track_package_id):
+# Functions to load packages onto trucks
+
+# Get the packages that must be delivered together
+def get_all_packages_to_load(graph, track_package_id):
     all_packages = []
     for vertex, packages in graph.vertices.items():
         for package in packages:
             if package.package_id not in track_package_id:
                 all_packages.append(package)
-    random.shuffle(all_packages)  # Shuffle the list of packages randomly
     # print("ALL_PACKAGES: ", all_packages)
     return all_packages
 
 
+# Check if the truck can load the package based on constraints
+def can_load_package(truck, package):
+    delivery_deadline = package.delivery_deadline
+    special_notes = package.special_notes
+    package_id = package.package_id
+    # Check if the truck is full
+    if truck.get_package_count() >= 16:
+        return False
+
+    # Check if the package has a deadline of 9:00 AM or is one of the packages that must be delivered together
+    elif delivery_deadline == '9:00 AM' or package_id in [15, 14, 19, 16, 13, 20]:
+        if truck.truck_id == 1:
+            return True
+        return False
+
+    # Check if the package has a deadline of 10:30 AM or must be delivered on truck 2
+    elif delivery_deadline == '10:30AM' or special_notes == 'Can only be on truck 2' or special_notes == ('Wrong '
+                                                                                                          'address '
+                                                                                                          'listed'):
+        if truck.truck_id == 2:
+            return True
+        return False
+
+    # If the package has a deadline of EOD or is delayed on flight, it can be loaded on truck 3
+    elif delivery_deadline == 'EOD' or special_notes == 'Delayed on flight---will not arrive to depot until 9:05 am':
+        if truck.truck_id == 3:
+            return True
+
+    return False  # Return False if none of the constraints are met
+
+
+# Check if the package has any constraints in its special notes
+def package_has_constraints(package):
+    special_notes = package.special_notes
+    return any(
+        "Can only be on truck" in special_notes or
+        "Delayed on flight---will not arrive to depot until 9:05 am" in special_notes or
+        "Wrong address listed" in special_notes or "Must be delivered with" in special_notes
+        for _ in special_notes
+    )
+
+
+# Randomize the order of the packages
+def randomize_packages(packages):
+    """
+    Randomize the order of the packages.
+
+    Args:
+        packages (list): The list of packages to randomize.
+
+    Returns:
+        list: The list of packages in a random order.
+    """
+    random.shuffle(packages)
+    return packages
+
+
+# Sort the packages by distance from the current vertex
 def sort_packages_by_distance(truck, remaining_packages, graph):
     current_vertex = truck.route[-1]
     remaining_packages.sort(key=lambda package: graph.edge_weight[current_vertex][package.address])
@@ -118,6 +177,10 @@ def get_left_over_packages(graph, track_package_id):
 
 # Load the left_over packages onto trucks after loading them with the specific constraints,
 # to make sure all 40 packages are on the trucks
+# packages that share the same address will be loaded together
+# packages that have special notes 'Can only be on truck 2' will be loaded on truck 2
+# packages that have special notes
+# 'Delayed on flight---will not arrive to depot until 9:05 am' will be loaded on truck 3
 def load_left_over_packages(trucks, left_over, track_package_id):
     """
     Load left over packages into the trucks.
@@ -149,6 +212,29 @@ def load_left_over_packages(trucks, left_over, track_package_id):
                 # Break out of the loop if the truck is full
                 if len(trucks.get_packages()) >= 16:
                     break
+            # Check if the package has special note 'Can only be on truck 2'
+            elif package_left.special_notes == 'Can only be on truck 2':
+                # Check if the current truck is truck 2
+                if trucks.truck_id == 2:
+                    # Insert the package into the truck
+                    trucks.insert_packages(package_left)
+                    # Add the package_id to the track_package_id set
+                    track_package_id.add(package_left.package_id)
+                    # Break out of the loop if the truck is full
+                    if len(trucks.get_packages()) >= 16:
+                        break
+            # Check if the package has special note 'Delayed on flight---will not arrive to depot until 9:05 am'
+            # Check if the package has special note 'Delayed on flight---will not arrive to depot until 9:05 am'
+            elif package_left.special_notes == 'Delayed on flight---will not arrive to depot until 9:05 am':
+                # Check if the current truck is truck 3
+                if trucks.truck_id == 3:
+                    # Insert the package into the truck
+                    trucks.insert_packages(package_left)
+                    # Add the package_id to the track_package_id set
+                    track_package_id.add(package_left.package_id)
+                    # Break out of the loop if the truck is full
+                    if len(trucks.get_packages()) >= 16:
+                        break
 
     """Get packages from the AdjacencyMatrix.Graph object with the specified delivery_deadline 
        'EOD' and the constraints associated with each individual packages
