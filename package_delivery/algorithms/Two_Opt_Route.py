@@ -15,6 +15,16 @@ def two_opt_swap(route, i, j):
 
 
 def calculate_route_distance(route, graph):
+    """
+    Calculates the total distance of a given route on a graph.
+
+    Parameters:
+    route (list): A list representing the vertices of the route.
+    graph (Graph): An object representing the graph of locations and distances between them.
+
+    Returns:
+    int: The total distance of the route.
+    """
     total_distance = 0
     for i in range(len(route) - 1):
         from_vertex = route[i]

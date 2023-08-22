@@ -4,6 +4,8 @@ from package_delivery.data_structures.HashMap import package_hashmap
 
 # print(package_hashmap) # hashmap object printing correctly
 
+# The Graph class we will use to represent the delivery locations and distances associated with each package
+# and creating associations between vertices and package objects stored in HashMap class
 class Graph:
     def __init__(self):
         self.vertices = {}  # Dictionary of all vertices, which will be street address and their associated packages

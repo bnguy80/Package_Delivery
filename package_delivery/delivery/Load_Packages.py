@@ -5,6 +5,16 @@ import random
 
 # Get the packages that must be delivered together
 def get_all_packages_to_load(graph, track_package_id):
+    """
+    Get all packages to load based on the provided graph and track_package_id.
+
+    Parameters:
+        graph (Graph): The graph to get the packages to load from.
+        track_package_id (list): The list of package IDs to track.
+
+    Returns:
+        list: The list of packages to load.
+    """
     all_packages = []
     for vertex, packages in graph.vertices.items():
         for package in packages:
@@ -14,8 +24,18 @@ def get_all_packages_to_load(graph, track_package_id):
     return all_packages
 
 
-# Check if the truck can load the package based on constraints
-def can_load_package(truck, package):
+# Check if the truck can load the packages based on constraints
+def can_load_packages(truck, package):
+    """
+    Determines whether a given package can be loaded onto a truck based on various constraints.
+
+    Args:
+        truck: An instance of the Truck class representing the truck.
+        package: An instance of the Package class representing the package.
+
+    Returns:
+        bool: True if the package can be loaded onto the truck, False otherwise.
+    """
     delivery_deadline = package.delivery_deadline
     special_notes = package.special_notes
     package_id = package.package_id
@@ -47,6 +67,15 @@ def can_load_package(truck, package):
 
 # Check if the package has any constraints in its special notes
 def package_has_constraints(package):
+    """
+    Check if a package has any constraints.
+
+    Parameters:
+    - package: The package object to check.
+
+    Returns:
+    - True if the package has constraints, False otherwise.
+    """
     special_notes = package.special_notes
     return any(
         "Can only be on truck" in special_notes or
@@ -73,12 +102,36 @@ def randomize_packages(packages):
 
 # Sort the packages by distance from the current vertex
 def sort_packages_by_distance(truck, remaining_packages, graph):
+    """
+    Sorts the packages by their distance from the current vertex in the graph.
+
+    Args:
+        truck (Truck): The truck object representing the current state of the delivery truck.
+        remaining_packages (List[Package]): The list of remaining packages to be sorted.
+        graph (Graph): The graph object representing the delivery route.
+
+    Returns:
+        None
+    """
     current_vertex = truck.route[-1]
     remaining_packages.sort(key=lambda package: graph.edge_weight[current_vertex][package.address])
 
 
 # Load packages onto trucks with specific delivery_deadline and constraints required for each truck
 def load_packages(trucks, graph, delivery_deadline, constraints, track_package_id):
+    """
+    Loads packages into trucks based on delivery constraints and deadlines.
+
+    Args:
+        trucks (List): The list of trucks to load packages onto.
+        graph (Graph): The graph object representing the delivery locations and distances.
+        delivery_deadline (str): The deadline for delivery, either "EOD", "9:00 AM", or "10:30 AM".
+        constraints (list or str): The constraints for package loading. Can be a list of package IDs or a specific constraint string.
+        track_package_id (set): A set of package IDs that have already been loaded.
+
+    Returns:
+        None
+    """
     if constraints is None and delivery_deadline == "EOD":
         load_package = get_package_deadline_constraints_low_asc(graph, delivery_deadline)
         if len(trucks.get_packages()) < 16:
@@ -156,7 +209,7 @@ def load_packages(trucks, graph, delivery_deadline, constraints, track_package_i
 # when loading packages, get left_over from non-present package.pacakge_id's
 def get_left_over_packages(graph, track_package_id):
     """
-    Returns a list of packages that are not tracked.
+    Returns a list of packages that are not being tracked.
 
     Args:
         graph (Graph): The graph containing vertices and packages.
@@ -183,17 +236,16 @@ def get_left_over_packages(graph, track_package_id):
 # 'Delayed on flight---will not arrive to depot until 9:05 am' will be loaded on truck 3
 def load_left_over_packages(trucks, left_over, track_package_id):
     """
-    Load left over packages into the trucks.
+    Load the left_over packages into the trucks.
 
     Args:
-        trucks (Truck): The trucks object.
-        left_over (list): The list of left over packages.
-        track_package_id (set): The set of package IDs to track.
+        trucks (TruckManager): The manager object that handles the trucks.
+        left_over (List[List[Package]]): A nested list of left over packages.
+        track_package_id (Set[int]): A set to track the package IDs.
 
     Returns:
         None
     """
-    # Create a dictionary of truck packages
     truck_packages = {package.address: package for package in trucks.get_packages()}
 
     # Flatten the left_over list
@@ -245,6 +297,17 @@ def load_left_over_packages(trucks, left_over, track_package_id):
 
 
 def get_package_deadline_constraints_low_asc(graph, delivery_deadline):
+    """
+    Generates a list of packages that meet the specified delivery deadline for low priority truck.
+
+    Parameters:
+        - graph (Graph): The graph representing the vertices and their associated packages.
+        - delivery_deadline (int): The specified delivery deadline.
+
+    Returns:
+        - selected_packages (list): A list of packages that meet the specified delivery deadline and are not duplicates.
+    """
+
     # List that will store the selected packages that meet the specified delivery_deadline
     selected_packages = []
     # Set that will store the package_id's of the selected packages
@@ -267,6 +330,17 @@ def get_package_deadline_constraints_low_asc(graph, delivery_deadline):
 
 
 def get_package_deadline_constraints_med_asc(graph, delivery_deadline, constraints):
+    """
+    Generate a list of selected packages based on the given constraints for medium priority truck.
+
+    Args:
+        graph (Graph): The graph representing the package delivery network.
+        delivery_deadline (str): The delivery deadline for the packages.
+        constraints (str): The special notes or constraints for the packages.
+
+    Returns:
+        List[Package]: A list of selected packages that match the specified constraints and delivery deadline.
+    """
     # Packages matching the '10:30 AM' delivery_deadline package.address
     constraints_list = [32, 8, 9, 4, 7]
     selected_packages = []
@@ -289,6 +363,17 @@ def get_package_deadline_constraints_med_asc(graph, delivery_deadline, constrain
 
 
 def get_package_deadline_constraints_high_asc(graph, constraints, delivery_deadline):
+    """
+    Returns a list of selected packages that meet the given constraints for high priority truck.
+
+    Parameters:
+    - graph (Graph): The graph representation of the packages and their connections.
+    - constraints (list): A list of package IDs that must be included in the selected packages.
+    - delivery_deadline (datetime): The delivery deadline that the packages must meet.
+
+    Returns:
+    - selected_packages (list): A list of Package objects that meet the constraints and delivery deadline.
+    """
     selected_packages = []
     # Set that will store the package_id's of the selected packages
     # to avoid duplicates in the list of packages returned
