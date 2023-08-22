@@ -1,5 +1,5 @@
 from package_delivery.algorithms.Load_Nearest_Neighbor import load_packages_nearest_neighbor
-from package_delivery.algorithms.Nearest_Neighbor_Algo import sort_packages_on_truck
+from package_delivery.algorithms.Sort_Nearest_Neighbor import sort_packages_on_truck
 from package_delivery.algorithms.Two_Opt_Route import two_opt_route
 from package_delivery.data_structures.Graph import graph_access
 from package_delivery.algorithms.DijkstraAlgo import dijkstra
@@ -44,48 +44,126 @@ class Trucks:
         self.truck_id = 0
 
     def insert_truck_id(self, truck_id):
+        """
+        Set the truck ID for the current instance.
+
+        Args:
+            truck_id (any): The ID of the truck to be set.
+
+        Returns:
+            None
+        """
         self.truck_id = truck_id
 
     # Insert packages to list self.packages and address of package to route to
     # list self.route
     def insert_packages(self, package):
+        """
+        Insert a package into the list of packages and update the routing address.
+
+        Parameters:
+            package (Package): The package object to be inserted.
+
+        Returns:
+            None
+        """
         self.packages.append(package)
         self.route.append(package.address)
 
     # Return the list of packages from Trucks object
     def get_packages(self):
+        """
+        Get the packages associated with this object.
+
+        Returns:
+            packages (list): A list of packages associated with this object.
+        """
         return self.packages
 
     # Remove package from Truck object after delivered
     # and remove address from route
     def remove_packages(self, package):
+        """
+        Remove a package from the list of packages and its corresponding route.
+
+        Parameters:
+            package (Package): The package object to be removed.
+
+        Returns:
+            None
+        """
         self.packages.remove(package)
         self.route.remove(package.address)
 
     def insert_distances_pred_vertex(self, distance, pred_vertex):
+        """
+        Add a distance and pred_vertex to the list of distances and pred_vertex.
+
+        Parameters:
+            distance (float): The distance to be added.
+            pred_vertex (str): The pred_vertex to be added.
+
+        Returns:
+            None
+        """
         self.distances.append(distance)
         self.pred_vertex.append(pred_vertex)
 
     def get_distances(self):
+        """
+        Get the distances.
+
+        Returns:
+            list: The list of distances.
+        """
         return self.distances
 
     # Print all packages list for Trucks object, useful to see what packages are loaded on
     # the trucks that are ordered by priority of deadline to delivery
     def print_packages(self):
+        """
+        Print the packages in the `self.packages` list.
+        """
         for package in self.packages:
             print(package)
 
     # Print route for Trucks object
     def print_route(self):
+        """
+        Print the current route.
+
+        This function prints the value of the `route` attribute of the current object.
+
+        Parameters:
+            self (Trucks): The current object.
+
+        Returns:
+            None
+        """
         print(self.route)
 
     # Return the count of list packages for Trucks object
     def get_package_count(self):
+        """
+        Calculates the number of packages in the current instance of the class.
+
+        Returns:
+            int: The number of packages in the current instance.
+        """
         return len(self.get_packages())
 
     # Set the edge_weight for all packages on truck
     @staticmethod
     def set_edge_weight(truck):
+        """
+        Set the edge weight for each package in the given truck.
+
+        Args:
+            truck (Trucks): The truck object for which to set the edge weights.
+
+        Returns:
+            None
+        """
         # From hub
         start_vertex = '4001 South 700 East'
         # Calculate edge weight between the package's location and the truck's starting location
@@ -171,6 +249,16 @@ def load_trucks(truck_high_priority, truck_medium_priority, truck_low_priority, 
 # Calculate the shortest route to deliver packages to destination
 # and back to hub after applying Dijkstra's algorithm
 def find_shortest_route_to_deliver(truck, graph):
+    """
+    Find the shortest route for a truck to deliver packages.
+
+    Parameters:
+        truck (Truck): The truck object representing the delivery truck.
+        graph (Graph): The graph object representing the delivery network.
+
+    Returns:
+        int: The total distance traveled by the truck to deliver all the packages.
+    """
     # Make a copy of the packages on the truck
     packages_copy = truck.get_packages().copy()
     # Starting location for all trucks, i.e. the hub
@@ -206,6 +294,18 @@ def find_shortest_route_to_deliver(truck, graph):
 # Simulate delivering of packages
 # Function to deliver packages using the TimeTracker instances inside each truck
 def deliver_packages(trucks, graph, start_interval, end_interval):
+    """
+    Delivers packages using a list of trucks, a graph, and time intervals.
+
+    Parameters:
+    - trucks (list): A list of truck objects representing the available trucks.
+    - graph (Graph): A graph object representing the delivery locations and distances.
+    - start_interval (str): The start time interval for package delivery.
+    - end_interval (str): The end time interval for package delivery.
+
+    Returns:
+    None
+    """
     # Define a mapping of truck objects to their names
     truck_names = {
         high_priority: "HIGH_PRIORITY",
@@ -269,6 +369,18 @@ def deliver_packages(trucks, graph, start_interval, end_interval):
 
 # After truck 1's delivery is completed, deliver truck 3's packages
 def deliver_truck3_packages(truck3, graph, start_interval, end_interval):
+    """
+    Deliver packages using truck 3 based on the provided parameters.
+
+    Parameters:
+        truck3 (Truck): The truck object representing truck 3.
+        graph (Graph): The graph object representing the delivery locations.
+        start_interval (str): The start time interval for package delivery.
+        end_interval (str): The end time interval for package delivery.
+
+    Returns:
+        None
+    """
     truck_name = "LOW_PRIORITY"
     time_tracker = truck3.time_tracker
 
@@ -322,9 +434,9 @@ medium_priority.time_tracker.initialize_multiple_package_status(medium_priority.
 low_priority.time_tracker.initialize_multiple_package_status(low_priority.get_packages(), 'AT_HUB', 3, 8.0)
 
 # Sort packages on trucks
-sort_packages_on_truck(high_priority, graph_access)
-sort_packages_on_truck(medium_priority, graph_access)
-sort_packages_on_truck(low_priority, graph_access)
+# sort_packages_on_truck(high_priority, graph_access)
+# sort_packages_on_truck(medium_priority, graph_access)
+# sort_packages_on_truck(low_priority, graph_access)
 
 truck_list = [high_priority, medium_priority, low_priority]
 deliver_packages(truck_list, graph_access, '8:35', '9:25')

@@ -34,7 +34,6 @@ def load_packages_submenu():
 
 
 def delivery_submenu():
-
     while True:
         sub_menu = input(
             "[0] Exit\n"
@@ -47,7 +46,6 @@ def delivery_submenu():
             start_interval = input("Enter start interval (e.g., '8:25', '9:35', '12:03'): ")
             end_interval = input("Enter end interval (e.g., '9:25', '10:25', '1:12'): ")
             Trucks.deliver_packages(trucks_list, graph_access, start_interval, end_interval)
-
 
 
 def ui():
@@ -94,5 +92,6 @@ def ui():
         ui()
 
 
-print("Welcome to Package Delivery System")
+print("ID:003964281")
+print("Welcome to Package Delivery System, please select an option: ")
 ui()

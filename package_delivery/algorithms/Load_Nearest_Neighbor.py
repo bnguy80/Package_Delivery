@@ -2,11 +2,22 @@ import math
 
 from package_delivery.delivery.Load_Packages import get_all_packages_to_load
 from package_delivery.delivery.Load_Packages import package_has_constraints
-from package_delivery.delivery.Load_Packages import can_load_package
+from package_delivery.delivery.Load_Packages import can_load_packages
 
 
 # Load the packages on truck using nearest neighbor algorithm
 def load_packages_nearest_neighbor(trucks, graph, track_package_id):
+    """
+    Loads packages into the trucks using a nearest neighbor algorithm.
+
+    Parameters:
+    - trucks (list): A list of truck objects representing the available trucks.
+    - graph (Graph): An object representing the graph of locations and distances.
+    - track_package_id (set): A set of package IDs that have been tracked.
+
+    Returns:
+    None
+    """
     for truck in trucks:
         current_vertex = '4001 South 700 East'
         remaining_packages = get_all_packages_to_load(graph, track_package_id)
@@ -18,20 +29,22 @@ def load_packages_nearest_neighbor(trucks, graph, track_package_id):
         unconstrained_packages = []
 
         for package in remaining_packages:
-            if can_load_package(truck, package):
+            if can_load_packages(truck, package):
                 constrained_packages.append(package)
             else:
                 # Add unconstrained packages to the unconstrained_packages list
                 # if they do not have constraints for the current truck
                 unconstrained_packages.append(package)
 
-        # Remove unconstrained packages with constraints from the unconstrained_packages list
+        # Remove unconstrained packages with constraints of the current truck from the unconstrained_packages list
         unconstrained_packages = [package for package in unconstrained_packages if not package_has_constraints(package)]
 
         # Combine the constrained_packages and unconstrained_packages lists to form a list of all packages
         # for the current truck
         all_packages = constrained_packages + unconstrained_packages
 
+        # Keep count to 14 packages per truck to make sure all packages are loaded
+        # without any errors
         while truck.get_package_count() < 14 and len(all_packages) > 0:
             min_distance = math.inf
             nearest_package = None
