@@ -86,7 +86,6 @@ def two_opt_route(trucks, graph):
             for j in range(i + 1, len(current_route) - 1):
 
                 new_route = two_opt_swap(current_route, i, j)
-
                 # Calculate distance of new_route
                 new_distance = calculate_route_distance(new_route, graph)
                 # If new_distance is improvement of current best_route then update
@@ -96,10 +95,8 @@ def two_opt_route(trucks, graph):
                     improvement = True
         # Set current_route to best_route in this iteration
         current_route = best_route
-        # print("BEST_ROUTE: ", current_route)
     # Update the truck's route with the optimized route
     trucks.route = best_route
-    # print("TWO-OPT ROUTE: ", best_route)
     # Optimize the order of packages to reflect the optimized route
     optimized_packages = []
     for address in current_route:
@@ -108,4 +105,3 @@ def two_opt_route(trucks, graph):
                 optimized_packages.append(package)
                 break
     trucks.packages = optimized_packages
-    # print("TRUCK: ", trucks.truck_id, " OPTIMIZED_ROUTE TWO-OPT: ", trucks.route)

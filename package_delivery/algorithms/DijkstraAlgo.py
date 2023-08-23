@@ -8,6 +8,19 @@ import math
 # find path to from start_vertex to end_vertex pred_vertex, whenever comparison to assign distance, append pred_vertex
 #
 def dijkstra(graph1, src, route):
+    """
+    Calculates the shortest distances and predecessor vertices for a given source vertex in a weighted graph using
+    Dijkstra's algorithm.
+
+    Parameters:
+    - graph1 (Graph): The graph object representing the weighted graph.
+    - src (int): The source vertex from which to calculate the shortest distances.
+    - route (list): The list of vertices to consider in the calculation of shortest distances.
+
+    Returns: - distances (dict): A dictionary mapping each vertex in the route to its shortest distance from the
+    source vertex. - pred_vertex (dict): A dictionary mapping each vertex in the graph to its predecessor vertex in
+    the shortest path from the source vertex.
+    """
     distances: dict = {node: math.inf for node in route}  # Initialize all distances to infinity in route
     pred_vertex: dict = {node: None for node in graph1.vertices}  # Initialize predecessor vertices to None
     distances[src] = 0  # Set source vertex distance to 0
@@ -52,6 +65,16 @@ def dijkstra(graph1, src, route):
 
 
 def print_distances_and_pred_vertex(distances, pred_vertex):
+    """
+    Print the distances and predecessor vertices.
+
+    Parameters:
+        distances (dict): A dictionary containing the distances of each vertex.
+        pred_vertex (dict): A dictionary containing the predecessor vertex of each vertex.
+
+    Returns:
+        None
+    """
     print("Distances:")
     for vertex, distance in distances.items():
         print(f"{vertex}: {distance}")
@@ -59,11 +82,3 @@ def print_distances_and_pred_vertex(distances, pred_vertex):
     print("\nPredecessor Vertices:")
     for vertex, predecessor in pred_vertex.items():
         print(f"{vertex}: {predecessor}")
-
-
-# target1 = '1060 Dalton Ave S'
-# distances1, pred_vertex1 = dijkstra(graph_access, '4001 South 700 East')
-# print("DISTANCES-DIJKSTRA, PRED_VERTEX == ", distances1, pred_vertex1)
-# print(reconstruct_path(pred_vertex1,  target1))
-# print_distances_and_path(distances1, pred_vertex1, '1060 Dalton Ave S')
-# print(graph.vertices)
