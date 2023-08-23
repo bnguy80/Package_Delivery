@@ -63,6 +63,3 @@ def sort_packages_on_truck(trucks, graph):
     sorted_route.append(hub_vertex)
     trucks.packages = sorted_packages
     trucks.route = sorted_route
-    # print()
-    # print("SORTED_ROUTE: ", sorted_route)
-    # print()
