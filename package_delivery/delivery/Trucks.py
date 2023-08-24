@@ -233,17 +233,10 @@ def load_trucks(truck_high_priority, truck_medium_priority, truck_low_priority, 
     # After loading packages to satisfy constraints
     # Combine the left-over packages from all three priority levels
     left_over1.append(get_left_over_packages(graph_access, track_package_id1))
-    # print()
-    # print("LEFT_OVER_PACKAGES1 BEFORE FUNCTION LOAD_LEFT_OVER: ", left_over1)
     # Load left-over packages onto non-full trucks
     load_left_over_packages(high_priority, left_over1, track_package_id1)
-    print("high priority: ", high_priority.get_package_count())
     load_left_over_packages(medium_priority, left_over1, track_package_id1)
-    print("medium priority: ", medium_priority.get_package_count())
     load_left_over_packages(low_priority, left_over1, track_package_id1)
-    print("low priority: ", low_priority.get_package_count())
-    print("NEWLINE ---\n")
-    print("LOAD LEFT OVER PACKAGES AFTER: ", left_over1)
 
 
 # Calculate the shortest route to deliver packages to destination
@@ -320,7 +313,7 @@ def deliver_packages(trucks, graph, start_interval, end_interval):
         time_tracker = current_truck.time_tracker
         # Get the name of the current truck
         truck_name = truck_names[current_truck]
-        # Initialize the time for the current truck
+        # Initialize tracking trucks
         time_tracker.insert_current_truck(current_truck.truck_id)
         print("NEW LINE---\n")
         # Check if current truck is ready for delivery
@@ -364,7 +357,7 @@ def deliver_packages(trucks, graph, start_interval, end_interval):
                 print("Start time:", start_interval, "End time:", end_interval)
                 print("FILTERED_PACKAGES:", filtered_packages)
                 print("TRUCK ROUTE:", current_truck.route)
-                time_tracker.print_miles_traveled(current_truck.truck_id)
+                time_tracker.print_current_truck_miles(current_truck.truck_id)
 
 
 # After truck 1's delivery is completed, deliver truck 3's packages
@@ -406,7 +399,7 @@ def deliver_truck3_packages(truck3, graph, start_interval, end_interval):
     print("Start time:", start_interval, "End time:", end_interval)
     print("FILTERED_PACKAGES:", filtered_packages)
 
-    time_tracker.print_miles_traveled(truck3.truck_id)
+    time_tracker.print_current_truck_miles(truck3.truck_id)
 
 
 # Delivered by 9:00am, constraint of having multiple packages on same truck delivered together, Truck 1
@@ -421,10 +414,7 @@ low_priority.insert_truck_id(3)
 
 # Load trucks
 load_trucks(high_priority, medium_priority, low_priority, graph_access, track_package_id1)
-# Initialize tracking trucks
-# high_priority.time_tracker.insert_current_truck(high_priority.truck_id)
-# medium_priority.time_tracker.insert_current_truck(medium_priority.truck_id)
-# low_priority.time_tracker.insert_current_truck(low_priority.truck_id)
+
 # Initialize packages
 high_priority.time_tracker.initialize_multiple_package_status(high_priority.get_packages(), 'AT_HUB', 1, 8.0)
 medium_priority.time_tracker.initialize_multiple_package_status(medium_priority.get_packages(), 'AT_HUB', 2, 9.05)
@@ -433,14 +423,11 @@ medium_priority.time_tracker.initialize_multiple_package_status(medium_priority.
 # and current_time attributes to reflect the time it will start delivering packages
 low_priority.time_tracker.initialize_multiple_package_status(low_priority.get_packages(), 'AT_HUB', 3, 8.0)
 
-# Sort packages on trucks
-# sort_packages_on_truck(high_priority, graph_access)
-# sort_packages_on_truck(medium_priority, graph_access)
-# sort_packages_on_truck(low_priority, graph_access)
+trucks_list = [high_priority, medium_priority, low_priority]
+deliver_packages(trucks_list, graph_access, '12:03', '1:12')
 
-truck_list = [high_priority, medium_priority, low_priority]
-deliver_packages(truck_list, graph_access, '8:35', '9:25')
-# deliver_packages(truck_list, graph_access, '9:35', '10:25')
-# deliver_packages(truck_list, graph_access, '12:03', '1:12')
-
-# high_priority.time_tracker.lookup_package_status(34, '8:00')
+# Working on to calculate total miles traveled of all trucks
+total_miles_traveled = 0
+for truck in trucks_list:
+    total_miles_traveled += truck.time_tracker.calculate_total_miles_traveled()
+print("Total miles traveled:", total_miles_traveled)

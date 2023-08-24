@@ -217,7 +217,6 @@ def print_package_deadline_asc(graph, delivery_deadline):
         None
     """
     for vertex, packages in graph.vertices.items():
-        # print(f"Vertex: {vertex}")
         for package in packages:
             # Check if the package has the specified deadline in its
             # deadline attribute
@@ -229,7 +228,6 @@ def print_package_deadline_asc(graph, delivery_deadline):
 
 graph_access = load_graph(r'C:\Users\brand\IdeaProjects\Package_Delivery_Program_New\package_delivery\data_structures'
                           r'\WGUPS_distances.csv')
-# graph_access.insert_packages_vertex_associate(package_hashmap)
 graph_access.insert_packages_vertex_associate(package_hashmap)
 
 # 7/25/23: All 40 packages associated correctly with their vertex(address)
