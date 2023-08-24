@@ -329,7 +329,7 @@ class TimeTracker:
         self.track_miles_traveled[current_truck] = current_miles_traveled + miles
 
     # Print miles traveled by current truck
-    def print_miles_traveled(self, current_truck):
+    def print_current_truck_miles(self, current_truck):
         """
         Print the number of miles traveled by a specific truck.
 
@@ -342,6 +342,18 @@ class TimeTracker:
         miles_traveled = self.track_miles_traveled[current_truck]
         print("MILES_TRAVELED: ", miles_traveled, " miles")
         print()
+
+    def calculate_total_miles_traveled(self):
+        """
+        Calculates the total miles traveled by summing the values in the track_miles_traveled dictionary.
+
+        Parameters:
+            self (TimeTracker): The instance of the class.
+
+        Returns:
+            float: The total miles traveled.
+        """
+        return sum(self.track_miles_traveled.values())
 
     # Calculate the time in minutes: time = distance / speed
     def calculate_travel_time_minutes(self, distance):

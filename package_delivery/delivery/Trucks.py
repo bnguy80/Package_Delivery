@@ -357,7 +357,7 @@ def deliver_packages(trucks, graph, start_interval, end_interval):
                 print("Start time:", start_interval, "End time:", end_interval)
                 print("FILTERED_PACKAGES:", filtered_packages)
                 print("TRUCK ROUTE:", current_truck.route)
-                time_tracker.print_miles_traveled(current_truck.truck_id)
+                time_tracker.print_current_truck_miles(current_truck.truck_id)
 
 
 # After truck 1's delivery is completed, deliver truck 3's packages
@@ -399,7 +399,7 @@ def deliver_truck3_packages(truck3, graph, start_interval, end_interval):
     print("Start time:", start_interval, "End time:", end_interval)
     print("FILTERED_PACKAGES:", filtered_packages)
 
-    time_tracker.print_miles_traveled(truck3.truck_id)
+    time_tracker.print_current_truck_miles(truck3.truck_id)
 
 
 # Delivered by 9:00am, constraint of having multiple packages on same truck delivered together, Truck 1
@@ -422,3 +422,12 @@ medium_priority.time_tracker.initialize_multiple_package_status(medium_priority.
 # Placeholder for packages that will be delivered by truck 3, Truck 3 will have new time_to_start_delivery
 # and current_time attributes to reflect the time it will start delivering packages
 low_priority.time_tracker.initialize_multiple_package_status(low_priority.get_packages(), 'AT_HUB', 3, 8.0)
+
+trucks_list = [high_priority, medium_priority, low_priority]
+deliver_packages(trucks_list, graph_access, '12:03', '1:12')
+
+# Working on to calculate total miles traveled of all trucks
+total_miles_traveled = 0
+for truck in trucks_list:
+    total_miles_traveled += truck.time_tracker.calculate_total_miles_traveled()
+print("Total miles traveled:", total_miles_traveled)
