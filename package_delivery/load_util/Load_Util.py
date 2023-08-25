@@ -1,5 +1,8 @@
 import random
 
+# Initialize empty set to track loaded packages across all trucks to avoid duplicate packages loaded among them
+track_package_id1 = set()
+
 
 # Functions to load packages onto trucks
 
@@ -76,6 +79,11 @@ def package_has_constraints(package):
     Returns:
     - True if the package has constraints, False otherwise.
     """
+
+    excluded_package_ids = [15]  # List of package IDs to exclude
+
+    if package.package_id in excluded_package_ids:
+        return True  # Package has constraints, so return True
     special_notes = package.special_notes
     return any(
         "Can only be on truck" in special_notes or
