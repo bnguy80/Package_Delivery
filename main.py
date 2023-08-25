@@ -1,6 +1,6 @@
 from package_delivery.data_structures import HashMap
 from package_delivery.delivery import Trucks
-from package_delivery.delivery.Tracking import TimeTracker
+from package_delivery.tracking_util.Tracking_Util import validate_time_format
 from package_delivery.delivery.Trucks import high_priority, medium_priority, low_priority
 from package_delivery.data_structures.Graph import graph_access
 
@@ -46,24 +46,25 @@ def delivery_submenu():
             "[0] Exit\n"
             "[1] Start delivery and see status?\n"
             "[2] See single package status during delivery?\n"
+            "[3] See final status of all packages after delivery?\n"
         )
         if sub_menu == "0":
             print("Returning to main menu")
             break
         if sub_menu == "1":
             started_delivery = True
-            start_interval = input("Enter start interval (e.g., '8:25', '9:35', '12:03'): ")
-            end_interval = input("Enter end interval (e.g., '9:25', '10:25', '1:12'): ")
-            if not TimeTracker.validate_time_format(start_interval) or not TimeTracker.validate_time_format(
+            start_interval = input("Enter start interval (e.g., '8:25 AM', '9:35 AM', '12:03 AM'): ")
+            end_interval = input("Enter end interval (e.g., '9:25 AM', '10:25 AM', '1:12 PM'): ")
+            if not validate_time_format(start_interval) or not validate_time_format(
                     end_interval):
                 continue
             while True:
                 Trucks.deliver_packages(trucks_list, graph_access, start_interval, end_interval)
                 continue_delivery = input("Continue delivery? (Y/N): ")
                 if continue_delivery.upper() == "Y":
-                    start_interval = input("Enter start interval (e.g., '8:25', '9:35', '12:03'): ")
-                    end_interval = input("Enter end interval (e.g., '9:25', '10:25', '1:12'): ")
-                    if not TimeTracker.validate_time_format(start_interval) or not TimeTracker.validate_time_format(
+                    start_interval = input("Enter start interval (e.g., '8:25 AM', '9:35 AM', '12:03 AM'): ")
+                    end_interval = input("Enter end interval (e.g., '9:25 AM', '10:25 AM', '1:12 PM'): ")
+                    if not validate_time_format(start_interval) or not validate_time_format(
                             end_interval):
                         continue
                 else:
@@ -88,20 +89,30 @@ def delivery_submenu():
                         print(f"Package ID: {package.package_id}")
                     package_id = int(input("Enter package ID: "))
                     while True:
-                        current_time = input("Enter current time (e.g., '8:25', '9:35', '12:03'): ")
-                        if not TimeTracker.validate_time_format(current_time):
+                        current_time = input("Enter current time (e.g., '8:25 AM', '9:35 AM', '12:03 PM'): ")
+                        if not validate_time_format(current_time):
                             continue
-                        selected_truck.time_tracker.lookup_package_status(package_id, current_time)
+                        selected_truck.time_tracker.lookup_single_package_status(package_id, current_time)
                         continue_seeing = input("Continue seeing status with different time? (Y/N): ")
                         if continue_seeing.upper() == "Y":
-                            current_time = input("Enter current time (e.g., '8:25', '9:35', '12:03'): ")
-                            if not TimeTracker.validate_time_format(current_time):
+                            current_time = input("Enter current time (e.g., '8:25 AM', '9:35 AM', '12:03 PM'): ")
+                            if not validate_time_format(current_time):
                                 continue
-                            selected_truck.time_tracker.lookup_package_status(package_id, current_time)
+                            selected_truck.time_tracker.lookup_single_package_status(package_id, current_time)
                         else:
                             break
             else:
                 print("Invalid Truck ID")
+        if sub_menu == "3":
+            if not started_delivery:
+                print("Start delivery first!")
+                ui()
+            print("Final status of all packages:")
+            Trucks.deliver_packages(trucks_list, graph_access, "8:00 AM", "5:00 PM")
+            total_miles = 0
+            for truck in trucks_list:
+                total_miles += truck.time_tracker.calculate_total_miles_traveled()
+            print(f"Total miles traveled: {total_miles}")
 
 
 def ui():

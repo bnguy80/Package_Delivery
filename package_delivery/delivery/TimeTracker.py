@@ -1,6 +1,7 @@
-from datetime import datetime
-
 from package_delivery.data_structures.HashMap import HashMapEntry
+from package_delivery.tracking_util.Tracking_Util import float_time_24hr_str
+from package_delivery.tracking_util.Tracking_Util import convert_time_str_to_datetime
+from package_delivery.tracking_util.Tracking_Util import convert_12h_to_24h_datetime
 
 
 class TimeTracker:
@@ -13,59 +14,6 @@ class TimeTracker:
         self.packages_status = {}
         # Dictionary to track miles traveled by each truck
         self.track_miles_traveled = {}
-
-    # Helper function to convert delivery_time to a comparable format
-    @staticmethod
-    def convert_deadline_time(delivery_deadline):
-        """
-        Converts a delivery deadline time string into a datetime object.
-
-        Parameters:
-            delivery_deadline (str): The delivery deadline time string in the format '%I:%M %p'.
-
-        Returns:
-            datetime: The converted datetime object.
-
-        """
-        if delivery_deadline == 'EOD':
-            return datetime.strptime('5:00 PM', '%I:%M %p')
-        else:
-            return datetime.strptime(delivery_deadline, '%I:%M %p')
-
-    # Helper function to format time in 24-hour format
-    @staticmethod
-    def format_time(time):
-        """
-        Format the given time as a string in the format "HH:MM".
-
-        Parameters:
-            time (float): The time to be formatted, represented as a decimal number.
-
-        Returns:
-            str: The formatted time string in the format "HH:MM".
-        """
-        hour, minute = divmod(time, 1)
-        minute = round(minute * 60)
-        return f"{int(hour):02d}:{int(minute):02d}"
-
-    # Helper function to validate time format
-    @staticmethod
-    def validate_time_format(input_time):
-        """
-        Validate the format of a given time string.
-
-        Parameters:
-        - input_time (str): The time string to be validated.
-
-        Returns:
-        - bool: True if the time string is in the correct 'HH:MM' format, False otherwise.
-        """
-        try:
-            datetime.strptime(input_time, '%H:%M')
-            return True
-        except ValueError:
-            print("Invalid time format! Please use 'HH:MM' format.")
-            return False
 
     # Fixed speed of truck to calculate travel time
     def get_truck_speed(self):
@@ -93,7 +41,8 @@ class TimeTracker:
         elif current_truck == 2:
             self.track_truck_current_time[current_truck] = 9.083333  # Set truck 2 start time to string 9:05
         elif current_truck == 3:
-            self.track_truck_current_time[current_truck] = 0  # Set truck 3 start time to 0
+            # Set truck 3 start time to 0, will be updated when start delivery after truck 1
+            self.track_truck_current_time[current_truck] = 0
 
     # Get all the trucks
     def get_all_trucks(self):
@@ -125,10 +74,10 @@ class TimeTracker:
         """
         return self.packages_status
 
-    # Lookup package status by package_id and current_time to determine if package is delivered or in transit
-    def lookup_package_status(self, package_id, current_time):
+    # Lookup single package status by package_id and current_time to determine if package is delivered or in transit
+    def lookup_single_package_status(self, package_id, current_time):
         """
-        Looks up the status of a package based on the provided package ID and current time.
+        Looks up single the status of a package based on the provided package ID and current time.
 
         Parameters:
             package_id (int): The ID of the package to look up.
@@ -137,12 +86,12 @@ class TimeTracker:
         Returns:
             None
         """
-        before_load = datetime.strptime('8:00', '%H:%M').time()
-        current_time = datetime.strptime(current_time, '%H:%M').time()
+        before_load = convert_12h_to_24h_datetime('8:00 AM')
+        current_time = convert_12h_to_24h_datetime(current_time)
         for package, status_info in self.packages_status.items():
             if package.package_id == package_id:
                 time_delivered_str = status_info['time_delivered']
-                time_delivered = datetime.strptime(time_delivered_str, '%H:%M').time()
+                time_delivered = convert_time_str_to_datetime(time_delivered_str)
                 status_info_copy = status_info.copy()
                 if current_time >= time_delivered and current_time >= before_load:
                     status_info_copy['status'] = 'DELIVERED'
@@ -232,20 +181,21 @@ class TimeTracker:
         Returns:
             None
         """
+        formatted_time_to_start_delivery = float_time_24hr_str(time_loaded)
         for package in packages:
-            delivery_deadline = self.convert_deadline_time(package.delivery_deadline)
-            formatted_delivery_time = delivery_deadline.strftime('%H:%M')  # Format to 24-hour format
+            delivery_deadline = convert_12h_to_24h_datetime(package.delivery_deadline)
+            formatted_delivery_time = delivery_deadline.strftime('%H:%M')
             if package not in self.packages_status:
                 self.packages_status[package] = {
                     'status': initial_status,
                     'truck': truck_id,
-                    'time_loaded': time_loaded,
+                    'time_loaded': time_loaded,  # Keep as float to increment time_delivered
                     'delivery_deadline': formatted_delivery_time,
-                    'time_to_start_delivery': time_loaded,
+                    'time_to_start_delivery': formatted_time_to_start_delivery,
                     'time_delivered': None
                 }
 
-    # Method to update the time_to_start_delivery for a specific truck for all packages on that truck
+    # Update the time_to_start_delivery for a specific truck for all packages on that truck
     def update_time_to_start_delivery(self, truck_id, new_time):
         """
         Updates the time to start delivery for all packages assigned to a given truck.
@@ -259,7 +209,7 @@ class TimeTracker:
         """
         for package_id, package_info in self.packages_status.items():
             if package_info['truck'] == truck_id:
-                package_info['time_to_start_delivery'] = self.format_time(new_time)
+                package_info['time_to_start_delivery'] = float_time_24hr_str(new_time)
 
     def get_truck_id_for_package(self, package):
         package_info = self.packages_status.get(package)
@@ -357,6 +307,15 @@ class TimeTracker:
 
     # Calculate the time in minutes: time = distance / speed
     def calculate_travel_time_minutes(self, distance):
+        """
+        Calculate the travel time in minutes based on the distance and the truck's speed.
+
+        Parameters:
+            distance (float): The distance to travel in kilometers.
+
+        Returns:
+            float: The travel time in minutes.
+        """
         speed = self.get_truck_speed()
         return distance / speed
 
@@ -379,7 +338,7 @@ class TimeTracker:
 
         self.increment_current_truck_time(transit_time_hours, current_truck_id)
         # Float to string for current_time
-        formatted_truck_current_time = self.format_time(self.track_truck_current_time[current_truck_id])
+        formatted_truck_current_time = float_time_24hr_str(self.track_truck_current_time[current_truck_id])
         return formatted_truck_current_time
 
     def insert_current_truck_time_to_package(self, package, time_delivered):
@@ -399,6 +358,15 @@ class TimeTracker:
 
     # Trucks are ready to deliver packages
     def is_ready_to_deliver(self, current_truck):
+        """
+        Check if the specified truck is ready to deliver packages.
+
+        Parameters:
+            current_truck (Truck): The truck to check if it is ready to deliver.
+
+        Returns:
+            bool: True if the truck is ready to deliver, False otherwise.
+        """
         for package, status_info in self.packages_status.items():
             if status_info['truck'] == current_truck.truck_id and status_info['status'] == 'AT_HUB':
                 return True
@@ -423,12 +391,21 @@ class TimeTracker:
     # Initialize package_status of a package to 'IN_TRANSIT' if time_delivered is has not changed
     # from the time_loaded of the package
     def initialize_status_to_in_transit(self, truck_id):
+        """
+        Initialize the status of packages to 'IN_TRANSIT' for a specific truck.
+
+        Parameters:
+            truck_id (int): The ID of the truck.
+
+        Returns:
+            None
+        """
         address_packages = {}
         for package, status_info in self.packages_status.items():
             if status_info['status'] == 'AT_HUB' and status_info['truck'] == truck_id and status_info[
                 'time_delivered'] is None:
                 status_info['status'] = 'IN_TRANSIT'
-                status_info['time_delivered'] = self.format_time(self.track_truck_current_time[truck_id])
+                status_info['time_delivered'] = float_time_24hr_str(self.track_truck_current_time[truck_id])
 
                 address = package.address
                 package_id = package.package_id
@@ -441,7 +418,7 @@ class TimeTracker:
             package_ids_str = ", ".join(str(id) for id in package_ids)
             print(
                 f"Package IDs: [{package_ids_str}] - Address: {address} - Status: IN_TRANSIT - Truck: {truck_id}, "
-                f"Time_Delivered NOT UPDATED YET: {self.format_time(self.track_truck_current_time[truck_id])}")
+                f"Time_Delivered NOT UPDATED YET: {float_time_24hr_str(self.track_truck_current_time[truck_id])}")
 
     # Update package_status of all packages to 'DELIVERED' after they are delivered
     def update_delivered_delivery(self, truck_id):
@@ -473,7 +450,7 @@ class TimeTracker:
             str: A string containing the delivered status of packages.
         """
         current_time = self.track_truck_current_time[truck_id]
-        formatted_current = TimeTracker.format_time(current_time)
+        formatted_current = float_time_24hr_str(current_time)
         delivered_packages_by_destination = {}
         for status in self.packages_status.values():
             if status == 'DELIVERED' and status['truck'] == truck_id:
@@ -491,26 +468,33 @@ class TimeTracker:
         result += f"DELIVERY_TIME: {formatted_current}"
         return result
 
-    # Dynamically update status of packages to 'IN_TRANSIT' and 'DELIVERED' as the truck travels
-    # Should not hard-code the package status to 'IN_TRANSIT' and 'DELIVERED' to avoid errors
+    # Dynamically update status of packages to 'AT_HUB','IN_TRANSIT','DELIVERED' as the truck travels
+    # Should not hard-code the package status to 'AT_HUB','IN_TRANSIT' and 'DELIVERED' to avoid errors
     def filter_packages_by_time_range(self, start_interval, end_interval):
         """
         Filter packages by time range.
         """
         filtered_packages = []
 
-        start_time = datetime.strptime(start_interval, '%H:%M').time()
-        end_time = datetime.strptime(end_interval, '%H:%M').time()
+        start_time = convert_12h_to_24h_datetime(start_interval)
+        end_time = convert_12h_to_24h_datetime(end_interval)
+
+        if start_time > end_time:
+            raise ValueError("Invalid time range")
 
         for package, status_info in self.packages_status.items():
             time_delivered_str = status_info['time_delivered']
+            time_to_start_delivery_str = status_info['time_to_start_delivery']
             try:
-                time_delivered = datetime.strptime(time_delivered_str, '%H:%M').time()
-                if start_time <= time_delivered <= end_time or time_delivered < start_time:
+                time_delivered = convert_time_str_to_datetime(time_delivered_str)
+                time_start_delivery = convert_time_str_to_datetime(time_to_start_delivery_str)
+                if time_start_delivery > start_time and time_start_delivery > end_time:
+                    filtered_packages.append([package, status_info])
+                elif start_time <= time_delivered <= end_time or time_delivered < start_time:
                     status_info_copy = status_info.copy()
                     status_info_copy['status'] = 'DELIVERED'
                     filtered_packages.append([package, status_info_copy])
-                elif time_delivered > end_time:
+                elif time_delivered > end_time > time_start_delivery:
                     status_info_copy1 = status_info.copy()
                     status_info_copy1['status'] = 'IN_TRANSIT'
                     filtered_packages.append([package, status_info_copy1])

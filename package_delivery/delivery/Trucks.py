@@ -1,14 +1,12 @@
 from package_delivery.algorithms.Load_Nearest_Neighbor import load_packages_nearest_neighbor
-from package_delivery.algorithms.Sort_Nearest_Neighbor import sort_packages_on_truck
 from package_delivery.algorithms.Two_Opt_Route import two_opt_route
 from package_delivery.data_structures.Graph import graph_access
 from package_delivery.algorithms.DijkstraAlgo import dijkstra
 from package_delivery.data_structures.HashMap import package_hashmap
-from package_delivery.delivery.Load_Packages import get_left_over_packages
-from package_delivery.delivery.Load_Packages import load_left_over_packages
-from package_delivery.delivery.Load_Packages import load_packages
-from package_delivery.delivery.Load_Tracking import track_package_id1
-from package_delivery.delivery.Tracking import TimeTracker
+from package_delivery.load_util.Load_Util import get_left_over_packages
+from package_delivery.load_util.Load_Util import load_left_over_packages
+from package_delivery.load_util.Load_Util import track_package_id1
+from package_delivery.delivery.TimeTracker import TimeTracker
 
 # Each truck can carry maximum of 16 packages
 #
@@ -227,7 +225,7 @@ def load_trucks(truck_high_priority, truck_medium_priority, truck_low_priority, 
     # Trucks.set_edge_weight(truck_low_priority)
 
     # Load packages onto trucks using nearest neighbor algorithm
-    trucks = [truck_low_priority, truck_medium_priority, truck_high_priority]
+    trucks = [truck_high_priority, truck_medium_priority, truck_low_priority]
     load_packages_nearest_neighbor(trucks, graph, track_package_id)
 
     # After loading packages to satisfy constraints
@@ -332,7 +330,7 @@ def deliver_packages(trucks, graph, start_interval, end_interval):
 
             # Check if the start time is 9:35 AM and update at 10:20 AM
             # If so, update the package with ID 9 to the new address
-            if start_interval == '9:35':
+            if start_interval == '9:35 AM':
                 package_to_update = package_hashmap.get_value_from_key(9)  # Get the package object
                 new_address = '410 S State St'
                 new_city = 'Salt Lake City'
@@ -424,10 +422,11 @@ medium_priority.time_tracker.initialize_multiple_package_status(medium_priority.
 low_priority.time_tracker.initialize_multiple_package_status(low_priority.get_packages(), 'AT_HUB', 3, 8.0)
 
 trucks_list = [high_priority, medium_priority, low_priority]
-deliver_packages(trucks_list, graph_access, '12:03', '1:12')
+deliver_packages(trucks_list, graph_access, '12:03 PM', '1:12 PM')
 
 # Working on to calculate total miles traveled of all trucks
 total_miles_traveled = 0
 for truck in trucks_list:
     total_miles_traveled += truck.time_tracker.calculate_total_miles_traveled()
 print("Total miles traveled:", total_miles_traveled)
+high_priority.time_tracker.lookup_single_package_status(15, '7:00 AM')

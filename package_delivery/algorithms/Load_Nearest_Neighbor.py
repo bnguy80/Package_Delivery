@@ -1,8 +1,8 @@
 import math
 
-from package_delivery.delivery.Load_Packages import get_all_packages_to_load
-from package_delivery.delivery.Load_Packages import package_has_constraints
-from package_delivery.delivery.Load_Packages import can_load_packages
+from package_delivery.load_util.Load_Util import get_all_packages_to_load
+from package_delivery.load_util.Load_Util import package_has_constraints
+from package_delivery.load_util.Load_Util import can_load_packages
 
 
 # Load the packages on truck using nearest neighbor algorithm
