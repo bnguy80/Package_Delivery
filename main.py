@@ -1,17 +1,16 @@
-from package_delivery.data_structures import HashMap
-from package_delivery.delivery import Trucks
-from package_delivery.tracking_util.Tracking_Util import validate_time_format
-from package_delivery.delivery.Trucks import high_priority, medium_priority, low_priority
-from package_delivery.data_structures.Graph import graph_access
+from package_delivery.delivery import trucks
+from package_delivery.trackingutil.tracking_util import validate_time_format
+from package_delivery.delivery.trucks import high_priority, medium_priority, low_priority
+from package_delivery.datastructures.graph import graph_access
 
-from package_delivery.data_structures.HashMap import package_hashmap
+from package_delivery.datastructures.hash_map import package_hashmap
 
 trucks_list = [high_priority, medium_priority, low_priority]
-packages_loaded = False
+has_packages_loaded = False
 
 
 def load_packages_submenu():
-    global packages_loaded
+    global has_packages_loaded
     while True:
         sub_menu = input(
             "[0] Exit\n"
@@ -21,7 +20,7 @@ def load_packages_submenu():
             print("Returning to main menu")
             break
         elif sub_menu == "1":
-            packages_loaded = True
+            has_packages_loaded = True
             print("Truck1, optimized route:", high_priority.route)
             high_priority.time_tracker.print_all_package_status()
             print("Truck1, Number of packages: ", high_priority.get_package_count())
@@ -40,7 +39,7 @@ def load_packages_submenu():
 
 
 def delivery_submenu():
-    started_delivery = False
+    has_started_delivery = False
     while True:
         sub_menu = input(
             "[0] Exit\n"
@@ -52,14 +51,14 @@ def delivery_submenu():
             print("Returning to main menu")
             break
         if sub_menu == "1":
-            started_delivery = True
+            has_started_delivery = True
             start_interval = input("Enter start interval (e.g., '8:25 AM', '9:35 AM', '12:03 AM'): ")
             end_interval = input("Enter end interval (e.g., '9:25 AM', '10:25 AM', '1:12 PM'): ")
             if not validate_time_format(start_interval) or not validate_time_format(
                     end_interval):
                 continue
             while True:
-                Trucks.deliver_packages(trucks_list, graph_access, start_interval, end_interval)
+                trucks.deliver_packages(trucks_list, graph_access, start_interval, end_interval)
                 continue_delivery = input("Continue delivery? (Y/N): ")
                 if continue_delivery.upper() == "Y":
                     start_interval = input("Enter start interval (e.g., '8:25 AM', '9:35 AM', '12:03 AM'): ")
@@ -70,7 +69,7 @@ def delivery_submenu():
                 else:
                     break
         if sub_menu == "2":
-            if not started_delivery:
+            if not has_started_delivery:
                 print("Start delivery first!")
                 ui()
             print("Select Truck ID(1-3):")
@@ -104,11 +103,11 @@ def delivery_submenu():
             else:
                 print("Invalid Truck ID")
         if sub_menu == "3":
-            if not started_delivery:
+            if not has_started_delivery:
                 print("Start delivery first!")
                 ui()
             print("Final status of all packages:")
-            Trucks.deliver_packages(trucks_list, graph_access, "8:00 AM", "5:00 PM")
+            trucks.deliver_packages(trucks_list, graph_access, "8:00 AM", "5:00 PM")
             total_miles = 0
             for truck in trucks_list:
                 total_miles += truck.time_tracker.calculate_total_miles_traveled()
@@ -116,7 +115,7 @@ def delivery_submenu():
 
 
 def ui():
-    global packages_loaded
+    global has_packages_loaded
     main_menu = input(
         "[0] Exit\n"
         "[1] See all packages\n"
@@ -131,7 +130,7 @@ def ui():
     if main_menu == "1":
         print("PACKAGES:\n")
         package_hashmap.print_get_all_packages()
-        value = HashMap.check_all_packages(package_hashmap)
+        value = package_hashmap.check_all_packages()
         print("CHECK IF ALL 40 PACKAGES EXIST:", value)
         ui()
     if main_menu == "2":
@@ -156,7 +155,7 @@ def ui():
         ui()
 
     if main_menu == "4":
-        if not packages_loaded:
+        if not has_packages_loaded:
             print("Packages must be loaded onto trucks first!")
             ui()
         delivery_submenu()

@@ -4,6 +4,19 @@ import csv
 # Individual packages with their delivery relevant information to be represented as HashMap entries
 # Will be the values in key_value pair to enter into Hash Map
 class HashMapEntry:
+    """
+    Class to represent a HashMap entry to be used in a HashMap.
+
+    Attributes:
+        package_id (int): The ID of the package.
+        address (str): The address of the package.
+        city (str): The city of the package.
+        state (str): The state of the package.
+        zipcode (str): The zipcode of the package.
+        delivery_deadline (str): The delivery deadline of the package.
+        mass (str): The mass of the package.
+        special_notes (str): Any special notes for the package.
+    """
 
     def __init__(self, package_id, address, city, state, zipcode, delivery_deadline, mass, special_notes):
         """
@@ -55,7 +68,6 @@ class HashMapEntry:
     def __repr__(self):
         """
         Returns a string representation of the object.
-        This function concatenates the values of the package_id, address, city, state, zipcode, delivery_deadline, mass, and special_notes attributes, and returns them as a formatted string.
 
         Returns:
             str: A string representation of the object.
@@ -64,8 +76,20 @@ class HashMapEntry:
 
 
 class HashMap:
+    """
+    Class to represent a HashMap to store package information.
+
+    Attributes:
+        map (list): A list of buckets.
+    """
 
     def __init__(self, initial_size=10):
+        """
+        Initialize a HashMap.
+
+        Parameters:
+            initial_size (int): The initial size of the HashMap.
+        """
         # Initialize HashMap with empty buckets entries i.e. list
         self.map = []
         for i in range(initial_size):
@@ -86,7 +110,7 @@ class HashMap:
         return bucket
 
     # Insert new packages into hash Map
-    def insert_package(self, key, value):
+    def _insert_package(self, key, value):
         """
         Inserts a key-value pair into the hash table.
 
@@ -98,7 +122,7 @@ class HashMap:
             bool: True if the insertion was successful, False otherwise.
         """
         bucket = self._get_hash(key)  # Get bucket
-        bucket_list = self.map[bucket]  # Get bucket list where item will go
+        bucket_list = self.map[bucket]  # Get a bucket list where item will go
         key_value = [key, value]  # Key-entry pair
 
         # showing 10 empty buckets, followed by 30 filled buckets, not inserting into firstly into emtpy ones
@@ -109,7 +133,7 @@ class HashMap:
 
         if bucket_list is None:
             bucket_list = [key_value]
-            self.map = bucket_list
+            # self.map = bucket_list
             return True
         # If not, insert the item to the end of the bucket list.
         else:
@@ -208,7 +232,7 @@ class HashMap:
                     print("-" * 20)
             print("=" * 40)
 
-    # To update value in key-value pair if changed
+    # To update value in a key-value pair if changed
     def update_value(self, key, value):
         """
         Updates the value of a key in the map.
@@ -232,7 +256,7 @@ class HashMap:
         else:
             print(f"Error updating package with key: {key}")
 
-    # Find key-value pair to delete
+    # Find a key-value pair to delete
     def delete_key_value(self, key):
         """
         Deletes a key-value pair from the map based on the given key.
@@ -257,81 +281,78 @@ class HashMap:
         else:
             print("Error deleting key-value pair with key: " + key)
 
+    # Load Hash Map object with the values from csv file
+    def load_hash_map(self, file_name):
+        """
+        Loads the contents of a CSV file into a hash map.
 
-# Load Hash Map object with the values from csv file
-def load_hash_map(fileName):
-    """
-    Load data from a CSV file into a hash map.
+        Parameters:
+            file_name (str): The name of the CSV file to load.
 
-    Args:
-        fileName (str): The name of the CSV file.
+        Returns:
+            None: If an error occurs while loading the hash map.
+            self: The instance of the class after the CSV file is successfully loaded into the hash map.
+        """
+        try:
+            with open(file_name) as csv_file:
+                csv_reader = csv.reader(csv_file)
 
-    Returns:
-        HashMap: The hash map containing the loaded data.
-    """
-    insert_into_hash_map = HashMap()
-    try:
-        with open(fileName) as csv_file:
-            csv_reader = csv.reader(csv_file)
+                for package in csv_reader:
+                    try:
+                        package_id = int(package[0])
+                        address = package[1]
+                        city = package[2]
+                        state = package[3]
+                        zipcode = package[4]
+                        delivery_deadline = package[5]
+                        mass = package[6]
+                        special_notes = package[7]
 
-            for package in csv_reader:
-                try:
-                    package_id = int(package[0])
-                    address = package[1]
-                    city = package[2]
-                    state = package[3]
-                    zipcode = package[4]
-                    delivery_deadline = package[5]
-                    mass = package[6]
-                    special_notes = package[7]
+                        # Key to directly hash
+                        key = package_id
 
-                    # Key to directly hash
-                    key = package_id
+                        # HashMapEntry object
+                        value = HashMapEntry(package_id, address, city, state, zipcode, delivery_deadline, mass,
+                                             special_notes)
+                        self._insert_package(key, value)
+                    except Exception as e:
+                        print(f"Error occurred while processing package: {e}")
+        except Exception as e:
+            print(f"Error occurred while loading hash map: {e}")
+            return None
 
-                    # HashMapEntry object
-                    value = HashMapEntry(package_id, address, city, state, zipcode, delivery_deadline, mass, special_notes)
-                    insert_into_hash_map.insert_package(key, value)
-                except Exception as e:
-                    print(f"Error occurred while processing package: {e}")
-    except Exception as e:
-        print(f"Error occurred while loading hash map: {e}")
+        return self
 
-    return insert_into_hash_map
+    # Get a full list of values printed, testing purposes for functions editing list
+    def get_hash_map_all(self):
+        """
+        Get all values from the hash map.
 
+        This function iterates over the keys from 1 to 40 and prints the corresponding value
+        from the `package_hashmap` using the `get_value_from_key` method.
 
-# Get full list of values printed, testing purposes for functions editing list
-def get_hash_map_all():
-    """
-    Get all values from the hash map.
+        Returns:
+            None
+        """
+        for i in range(1, 41):
+            print(self.get_value_from_key(i))
 
-    This function iterates over the keys from 1 to 40 and prints the corresponding value
-    from the `package_hashmap` using the `get_value_from_key` method.
+    # Check if all packages exist in HashMap object for testing purposes
+    def check_all_packages(self):
+        """
+        Checks if all packages have values assigned to them.
 
-    Returns:
-        None
-    """
-    for i in range(1, 41):
-        print(package_hashmap.get_value_from_key(i))
-
-
-# Check if all packages exist in HashMap object for testing purposes
-def check_all_packages(hashmap, total_packages=40):
-    """
-    Check if all packages are present in the hashmap.
-
-    Parameters:
-        hashmap (HashMap): A dictionary containing package IDs as keys and their values.
-        total_packages (int): The total number of packages to check.
-
-    Returns:
-        bool: True if all packages are present in the hashmap, False otherwise.
-    """
-    for package_id in range(1, total_packages + 1):
-        if hashmap.get_value_from_key(package_id) is None:
-            return False
-    return True
+        Returns:
+            bool: True if all packages have values assigned, False otherwise.
+        """
+        TOTAL_PACKAGES = 40
+        for package_id in range(1, TOTAL_PACKAGES + 1):
+            if self.get_value_from_key(package_id) is None:
+                return False
+        return True
 
 
-# Hash Map object instance to insert into HashMap
-package_hashmap = load_hash_map(r'C:\Users\brand\IdeaProjects\Package_Delivery_Program_New\package_delivery'
-                                r'\data_structures\WGUPS Package File Formatted.csv')
+# Initialize HashMap object and load data
+package_hashmap = HashMap()
+package_hashmap.load_hash_map(r'C:\Users\brand\IdeaProjects\Package_Delivery_Program_New\package_delivery'
+                              r'\datastructures\WGUPS Package File Formatted.csv')

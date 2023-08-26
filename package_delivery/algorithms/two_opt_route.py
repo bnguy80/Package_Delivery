@@ -44,7 +44,7 @@ def remove_repeated_vertices(route):
     Returns:
         list: A copy of the route list with repeated vertices removed.
     """
-    # Create new list with first vertex from current route
+    # Create a new list with first vertex from the current route
     unique_route = [route[0]]
     for vertex in route:
         # If the current vertex is different from the last vertex added to the unique route,
@@ -56,7 +56,7 @@ def remove_repeated_vertices(route):
 
 # Implement the two-opt algorithm, brute force approach, optimize the order of addresses in route in
 # conjunction to utilizing dijkstra's algorithm
-# Used to further decrease the total_distance traveled by the three trucks after nearest neighbor algorithm
+# Used to further decrease the total_distance traveled by the three trucks after the nearest neighbor algorithm
 # Starts at the hub, 4001 South 700 East, and ends at the hub
 def two_opt_route(trucks, graph):
     """
@@ -73,7 +73,7 @@ def two_opt_route(trucks, graph):
     unique_route = [vertex for vertex in remove_repeated_vertices(trucks.route) if vertex != '4001 South 700 East']
     # Initialize the unique_route to the current_route
     current_route = ['4001 South 700 East'] + unique_route + ['4001 South 700 East']
-    # Will be best optimized route
+    # Will be the best-optimized route
     best_route = current_route
     improvement = True
     # Continue to optimize until no further improvements are made
