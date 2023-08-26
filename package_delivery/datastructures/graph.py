@@ -26,7 +26,7 @@ class Graph:
     # Add new vertices to the graph.
     # Takes vertex(address) as parameter adds it to key 'vertices' dictionary with an empty list of values.
     # Prepares the vertex to have edges connected to it later
-    def add_vertex(self, vertex):
+    def _add_vertex(self, vertex):
         """
         Adds a vertex to the graph.
 
@@ -147,7 +147,7 @@ class Graph:
         """
         data = self.get_csv_vertex_distances(file_name)
         for row in data:
-            self.add_vertex(row[1])  # Addresses will act as vertices
+            self._add_vertex(row[1])  # Addresses will act as vertices
             for i in range(3, len(row)):  # 0-2 indexes are location_name, location_street, location_zip.
                 vertex1 = row[1]
                 vertex2 = data[i - 3][1]
