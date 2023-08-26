@@ -5,7 +5,7 @@ import math
 # src-> Hub to start all deliveries from
 # min_heap as priority queue to find minimum-distance neighbor, greedy approach: find min_distance
 # visited_queue = [] node after find minimum-distance neighbor
-# find path to from start_vertex to end_vertex pred_vertex, whenever comparison to assign distance, append pred_vertex
+# find a path to from start_vertex to end_vertex pred_vertex, whenever comparison to assign distance, append pred_vertex
 #
 def dijkstra(graph1, src, route):
     """
