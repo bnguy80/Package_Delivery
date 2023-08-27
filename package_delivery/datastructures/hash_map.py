@@ -281,7 +281,7 @@ class HashMap:
         else:
             print("Error deleting key-value pair with key: " + key)
 
-    # Load Hash Map object with the values from csv file
+    # Load a Hash Map object with the values from csv file
     def load_hash_map(self, file_name):
         """
         Loads the contents of a CSV file into a hash map.
@@ -308,7 +308,7 @@ class HashMap:
                         mass = package[6]
                         special_notes = package[7]
 
-                        # Key to directly hash
+                        # Key to direct hash
                         key = package_id
 
                         # HashMapEntry object
@@ -323,7 +323,7 @@ class HashMap:
 
         return self
 
-    # Get a full list of values printed, testing purposes for functions editing list
+    # Get a full list of values printed, testing purposes for a function editing list
     def get_hash_map_all(self):
         """
         Get all values from the hash map.
