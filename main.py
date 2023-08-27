@@ -4,6 +4,7 @@ from package_delivery.delivery.trucks import high_priority, medium_priority, low
 from package_delivery.datastructures.graph import graph_access
 
 from package_delivery.datastructures.hash_map import package_hashmap
+from package_delivery.visualization.visualize import Visualize
 
 trucks_list = [high_priority, medium_priority, low_priority]
 has_packages_loaded = False
@@ -114,6 +115,53 @@ def delivery_submenu():
             print(f"Total miles traveled: {total_miles}")
 
 
+def visualize_submenu():
+    is_address_added = False
+    vis = Visualize()
+    while True:
+        sub_menu = input(
+            "[0] Exit\n"
+            "[1] Add address\n"
+            "[2] Visualize individual package locations\n"
+            "[3] Visualize truck routes\n"
+        )
+        if sub_menu == "0":
+            print("Returning to main menu")
+            break
+        elif sub_menu == "1":
+            image_path = ('C:/Users/brand/IdeaProjects/Package_Delivery_Program_New/package_delivery/visualization'
+                          '/Picture1.jpg')
+            vis.load_image(image_path)
+            while True:
+                print("Truck1, optimized route:", high_priority.route)
+                print("Truck2, optimized route:", medium_priority.route)
+                print("Truck3, optimized route:", low_priority.route)
+                add_route_coordinates = input("Enter address to add: ")
+                vis.add_route_coord(add_route_coordinates)
+                continue_adding = input("Continue adding address? (Y/N): ")
+                if continue_adding.upper() == "N":
+                    break
+            is_address_added = True
+        elif sub_menu == "2":
+            if not is_address_added:
+                print("Add address first!")
+                continue
+            vis.visualize_package_locations()
+        elif sub_menu == "3":
+            print("Select Truck ID(1-3):")
+            truck_choice = int(input())
+            if 1 <= truck_choice <= 3:
+                image_path = ('C:/Users/brand/IdeaProjects/Package_Delivery_Program_New/package_delivery/visualization'
+                              '/Picture1.jpg')
+                vis.load_image(image_path)
+                vis.get_singe_truck_route(truck_choice)
+                vis.visualize_truck_routes()
+            else:
+                print("Invalid Truck ID")
+        else:
+            print("Invalid option, please try again")
+
+
 def ui():
     global has_packages_loaded
     main_menu = input(
@@ -122,18 +170,19 @@ def ui():
         "[2] See single package from package_ID \n"
         "[3] Load packages onto trucks \n"
         "[4] Start delivery \n"
+        "[5] Visualize delivery route \n"
     )
     if main_menu == "0":
         print("Exit")
         (SystemExit())
 
-    if main_menu == "1":
+    elif main_menu == "1":
         print("PACKAGES:\n")
         package_hashmap.print_get_all_packages()
         value = package_hashmap.check_all_packages()
         print("CHECK IF ALL 40 PACKAGES EXIST:", value)
         ui()
-    if main_menu == "2":
+    elif main_menu == "2":
         find = "Y"
         while find == "Y":
             try:
@@ -150,16 +199,22 @@ def ui():
                 find_again_upper = find_again.upper()
             find = find_again_upper
         ui()
-    if main_menu == "3":
+    elif main_menu == "3":
         load_packages_submenu()
         ui()
 
-    if main_menu == "4":
+    elif main_menu == "4":
         if not has_packages_loaded:
             print("Packages must be loaded onto trucks first!")
             ui()
         delivery_submenu()
         ui()
+
+    elif main_menu == "5":
+        visualize_submenu()
+        ui()
+    else:
+        print("Invalid option, please try again")
 
 
 print("ID:003964281")

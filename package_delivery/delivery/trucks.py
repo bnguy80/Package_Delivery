@@ -195,48 +195,19 @@ class Trucks:
 # priority_queue to pop off packages on trucks until empty?
 # Once the first truck is empty driver returns to the hub to get the next truck for deliveries
 def load_trucks(truck_high_priority, truck_medium_priority, truck_low_priority, graph, track_package_id):
-    # # Define the arguments as a single variable
-    # # Load high priority
-    # delivery_deadline1 = "9:00 AM"
-    # # packages besides 15, 14, 19, 16, 13, 20 share same package.address for some on loaded on truck
-    # constraint_list1 = [15, 14, 19, 16, 13, 20, 39, 21]
-    # args1 = {
-    #     'trucks': truck_high_priority,
-    #     'graph': graph,
-    #     'delivery_deadline': delivery_deadline1,
-    #     'constraints': constraint_list1,
-    #     'track_package_id': track_package_id,
-    #     # 'track_time': track_time1
-    # }
-    # load_packages(**args1)
-    # Trucks.set_edge_weight(truck_high_priority)
-    #
-    # # Load medium priority
-    # delivery_deadline2 = "10:30 AM"
-    # constraint_list2 = "Can only be on truck 2"
-    # args2 = {
-    #     'trucks': truck_medium_priority,
-    #     'graph': graph,
-    #     'delivery_deadline': delivery_deadline2,
-    #     'constraints': constraint_list2,
-    #     'track_package_id': track_package_id,
-    # }
-    # load_packages(**args2)
-    # Trucks.set_edge_weight(truck_medium_priority)
-    #
-    # # Load low priority
-    # delivery_deadline3 = "EOD"
-    # constraint_list3 = None
-    #
-    # args3 = {
-    #     'trucks': truck_low_priority,
-    #     'graph': graph,
-    #     'delivery_deadline': delivery_deadline3,
-    #     'constraints': constraint_list3,
-    #     'track_package_id': track_package_id,
-    # }
-    # load_packages(**args3)
-    # Trucks.set_edge_weight(truck_low_priority)
+    """
+    Load trucks with packages using the nearest neighbor algorithm.
+
+    Parameters:
+        truck_high_priority (Truck): The high-priority truck to load packages onto.
+        truck_medium_priority (Truck): The medium-priority truck to load packages onto.
+        truck_low_priority (Truck): The low-priority truck to load packages onto.
+        graph (Graph): The graph representing the delivery network.
+        track_package_id (int): The ID of the package to track.
+
+    Returns:
+        None
+    """
 
     # Load packages onto trucks using the nearest neighbor algorithm
     trucks = [truck_high_priority, truck_medium_priority, truck_low_priority]
@@ -435,12 +406,12 @@ medium_priority.time_tracker.initialize_multiple_package_status(medium_priority.
 # and current_time attributes to reflect the time it will start delivering packages
 low_priority.time_tracker.initialize_multiple_package_status(low_priority.get_packages(), 'AT_HUB', 3, 8.0)
 
-trucks_list = [high_priority, medium_priority, low_priority]
-deliver_packages(trucks_list, graph_access, '12:03 PM', '1:12 PM')
-
-# Working on to calculate total miles traveled of all trucks
-total_miles_traveled = 0
-for truck in trucks_list:
-    total_miles_traveled += truck.time_tracker.calculate_total_miles_traveled()
-print("Total miles traveled:", total_miles_traveled)
-high_priority.time_tracker.lookup_single_package_status(15, '7:00 AM')
+# trucks_list = [high_priority, medium_priority, low_priority]
+# deliver_packages(trucks_list, graph_access, '12:03 PM', '1:12 PM')
+#
+# # Working on to calculate total miles traveled of all trucks
+# total_miles_traveled = 0
+# for truck in trucks_list:
+#     total_miles_traveled += truck.time_tracker.calculate_total_miles_traveled()
+# print("Total miles traveled:", total_miles_traveled)
+# high_priority.time_tracker.lookup_single_package_status(15, '7:00 AM')
