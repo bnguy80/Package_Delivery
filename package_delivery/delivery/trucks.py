@@ -3,10 +3,11 @@ from package_delivery.algorithms.two_opt_route import two_opt_route
 from package_delivery.datastructures.graph import graph_access
 from package_delivery.algorithms.dijkstra_algo import dijkstra
 from package_delivery.datastructures.hash_map import package_hashmap
+from package_delivery.delivery.time_tracker import TimeTracker
 from package_delivery.loadutil.load_util import get_left_over_packages
 from package_delivery.loadutil.load_util import load_left_over_packages
 from package_delivery.loadutil.load_util import track_package_id1
-from package_delivery.delivery.time_tracker import TimeTracker
+from package_delivery.visualization.visualize import Visualize
 
 # Each truck can carry a maximum of 16 packages
 #
@@ -303,7 +304,7 @@ def deliver_packages(trucks, graph, start_interval, end_interval):
         if current_truck.time_tracker.is_ready_to_deliver(current_truck):
             # # Only print the route if the current truck is truck1 or truck2
             # if current_truck == high_priority or current_truck == medium_priority:
-            #     print(f"{truck_name}, OPTIMIZED_DELIVERY_ROUTE: ", current_truck.route)
+            #     print(f"{truck_name}, OPTIMIZED_DELIVERY_ROUTE: ", current_truck.route())
             # Only deliver packages if the current truck is truck1 or truck2
             if current_truck == high_priority or current_truck == medium_priority:
                 # Call the function two_opt_route to find the optimized route for the current truck
@@ -340,6 +341,7 @@ def deliver_packages(trucks, graph, start_interval, end_interval):
                 print("Start time:", start_interval, "End time:", end_interval)
                 print("FILTERED_PACKAGES:", filtered_packages)
                 print("TRUCK ROUTE:", current_truck.route)
+                Visualize.visualize_pie_chart(filtered_packages, truck_name, start_interval, end_interval)
                 time_tracker.print_current_truck_miles(current_truck.truck_id)
 
 
@@ -381,7 +383,7 @@ def deliver_truck3_packages(truck3, graph, start_interval, end_interval):
     filtered_packages = truck3.time_tracker.filter_packages_by_time_range(start_interval, end_interval)
     print("Start time:", start_interval, "End time:", end_interval)
     print("FILTERED_PACKAGES:", filtered_packages)
-
+    Visualize.visualize_pie_chart(filtered_packages, truck_name, start_interval, end_interval)
     time_tracker.print_current_truck_miles(truck3.truck_id)
 
 
@@ -406,8 +408,8 @@ medium_priority.time_tracker.initialize_multiple_package_status(medium_priority.
 # and current_time attributes to reflect the time it will start delivering packages
 low_priority.time_tracker.initialize_multiple_package_status(low_priority.get_packages(), 'AT_HUB', 3, 8.0)
 
-# trucks_list = [high_priority, medium_priority, low_priority]
-# deliver_packages(trucks_list, graph_access, '12:03 PM', '1:12 PM')
+trucks_list = [high_priority, medium_priority, low_priority]
+deliver_packages(trucks_list, graph_access, '8:25 AM', '9:35 AM')
 #
 # # Working on to calculate total miles traveled of all trucks
 # total_miles_traveled = 0

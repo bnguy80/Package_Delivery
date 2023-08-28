@@ -1,12 +1,12 @@
 import matplotlib.pyplot as plt
 
-from package_delivery.delivery.trucks import high_priority, low_priority, medium_priority
-
 
 class Visualize:
-    def __init__(self):
+    def __init__(self, trucks):
         self.image_path = None
         self.route = {}
+        # A list of trucks objects
+        self.trucks_list = trucks
         # All coordinates (x, y) dictionary; visualize a Picture1.jpg dimensions 672x756
         self.ALL_COORDINATES = {
             '4001 South 700 East': (397, 457),
@@ -68,6 +68,19 @@ class Visualize:
         else:
             print("Invalid address: ", {address})
 
+    def _get_coord_and_close_route(self):
+        """
+        Get the coordinates and close the route.
+
+        Returns:
+            Tuple: The x and y coordinates of the route.
+        """
+        x, y = zip(*self.route.values())
+        if x[0] != x[-1] or y[0] != y[-1]:
+            x = x + (x[0],)
+            y = y + (y[0],)
+        return x, y
+
     def get_singe_truck_route(self, truck_id):
         """
         Get the route for a single truck.
@@ -80,11 +93,11 @@ class Visualize:
         """
         truck = None
         if truck_id == 1:
-            truck = high_priority
+            truck = self.trucks_list[0]
         elif truck_id == 2:
-            truck = medium_priority
+            truck = self.trucks_list[1]
         elif truck_id == 3:
-            truck = low_priority
+            truck = self.trucks_list[2]
         if truck is not None:
             print(f"Fetching routes for truck {truck_id}...")  # Debug line
             for route in truck.route:
@@ -92,11 +105,6 @@ class Visualize:
                 self.add_route_coord(route)
         else:
             print(f"Invalid truck ID: {truck_id}")  # Debug line
-
-    def get_all_trucks_routes(self, trucks_list):
-        for truck in trucks_list:
-            for route in truck.route:
-                self.add_route_coord(route)
 
     # visualize package locations
     def visualize_package_locations(self):
@@ -155,15 +163,7 @@ class Visualize:
         fig, ax = plt.subplots(figsize=(image.shape[1] / 100, image.shape[0] / 100))
         ax.imshow(image)
 
-        # Extract the coordinates from the `self.route` dictionary
-        # and split them into x and y coordinates for plotting
-        x, y = zip(*self.route.values())
-
-        # If the route starts and ends at the same point, it'll already be closed.
-        # But if not, we can close it explicitly.
-        if x[0] != x[-1] or y[0] != y[-1]:
-            x = x + (x[0],)
-            y = y + (y[0],)
+        x, y = self._get_coord_and_close_route()
 
         ax.scatter(x, y, marker='o', color='red', s=50)
         ax.plot(x, y, color='blue', linestyle='dashed', linewidth=2)
@@ -177,29 +177,44 @@ class Visualize:
         self.route = {}
 
     def visualize_all_truck_routes(self):
-        """
-        Visualizes all the truck routes; overlay one image.
-
-        Parameters:
-        - None
-
-        Returns:
-        - None
-        """
         image = plt.imread(self.image_path)
         fig, ax = plt.subplots(figsize=(image.shape[1] / 100, image.shape[0] / 100))
         ax.imshow(image)
 
-        x, y = zip(*self.route.values())
+        colors = ['red', 'blue', 'green']
+        for idx, truck in enumerate(self.trucks_list):
+            # Reset the route for each truck
+            self.route = {}
+            for route in truck.route:
+                self.add_route_coord(route)
 
-        ax.scatter(x, y, marker='o', color='red', s=50)
-        ax.plot(x, y, color='blue', linestyle='dashed', linewidth=2)
+            x, y = self._get_coord_and_close_route()
+
+            ax.scatter(x, y, marker='o', color=colors[idx], s=50, label=truck.truck_id)
+            ax.plot(x, y, color=colors[idx], linestyle='dashed', linewidth=2)
+        ax.legend(loc='upper right', shadow=True)
         ax.axis('off')
         plt.show()
 
+    @staticmethod
+    def visualize_pie_chart(filtered_packages, truck_title, start_interval, end_interval):
+        # Status count of packages
+        status_count = {'IN_TRANSIT': 0, 'AT_HUB': 0, 'DELIVERED': 0}
+        for package, status_info in filtered_packages:
+            current_status = status_info['status']
+            if current_status in status_count:
+                status_count[current_status] += 1
 
-vis = Visualize()
-trucks_list1 = [high_priority, medium_priority, low_priority]
-vis.load_image('C:/Users/brand/IdeaProjects/Package_Delivery_Program_New/package_delivery/visualization/Picture1.jpg')
-vis.get_all_trucks_routes(trucks_list1)
-vis.visualize_all_truck_routes()
+        # Pie chart, where the slices will be ordered and plotted counter-clockwise:
+        labels = list(status_count.keys())
+        sizes = list(status_count.values())
+        colors = ['gold', 'yellowgreen', 'lightcoral']
+        explode = (0.1, 0.1, 0.1)
+        plt.pie(sizes, explode=explode, labels=labels, colors=colors, autopct='%1.1f%%', shadow=True, startangle=90)
+        plt.axis('equal')
+        plt.title(f'{truck_title} Package Status Distribution, {start_interval} - {end_interval}')
+        plt.show()
+
+# trucks_list1 = [high_priority, medium_priority, low_priority]
+# vis = Visualize(trucks_list1)
+# vis.load_image('C:/Users/brand/IdeaProjects/Package_Delivery_Program_New/package_delivery/visualization/Picture1.jpg')
