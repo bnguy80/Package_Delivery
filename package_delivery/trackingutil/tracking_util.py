@@ -28,6 +28,9 @@ def convert_time_str_to_datetime(time_str):
     Returns:
         datetime.time: The converted time as a datetime.time object.
     """
+    if time_str is None:
+        print(f"Warning: Could not convert time_delivered_str from {time_str} to datetime.time object.")
+        return None
     return datetime.strptime(time_str, '%H:%M').time()
 
 
