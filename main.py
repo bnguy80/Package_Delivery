@@ -117,13 +117,14 @@ def delivery_submenu():
 
 def visualize_submenu():
     is_address_added = False
-    vis = Visualize()
+    vis = Visualize(trucks_list)
     while True:
         sub_menu = input(
             "[0] Exit\n"
             "[1] Add address\n"
             "[2] Visualize individual package locations\n"
             "[3] Visualize truck routes\n"
+            "[4] Visualize pie chart of package status\n"
         )
         if sub_menu == "0":
             print("Returning to main menu")
@@ -158,6 +159,8 @@ def visualize_submenu():
                 vis.visualize_truck_routes()
             else:
                 print("Invalid Truck ID")
+        elif sub_menu == "4":
+            vis.visualize_pie_chart("8:00 AM", "5:00 PM")
         else:
             print("Invalid option, please try again")
 
