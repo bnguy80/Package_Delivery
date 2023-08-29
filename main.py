@@ -1,9 +1,7 @@
 from package_delivery.delivery import trucks
 from package_delivery.trackingutil.tracking_util import validate_time_format
 from package_delivery.delivery.trucks import high_priority, medium_priority, low_priority
-from package_delivery.datastructures.graph import graph_access
-
-from package_delivery.datastructures.hash_map import package_hashmap
+from package_delivery import datastructures as ds
 from package_delivery.visualization.visualize import Visualize
 
 trucks_list = [high_priority, medium_priority, low_priority]
@@ -59,7 +57,7 @@ def delivery_submenu():
                     end_interval):
                 continue
             while True:
-                trucks.deliver_packages(trucks_list, graph_access, start_interval, end_interval)
+                trucks.deliver_packages(trucks_list, ds.graph_access, start_interval, end_interval)
                 continue_delivery = input("Continue delivery? (Y/N): ")
                 if continue_delivery.upper() == "Y":
                     start_interval = input("Enter start interval (e.g., '8:25 AM', '9:35 AM', '12:03 AM'): ")
@@ -79,7 +77,7 @@ def delivery_submenu():
             if 1 <= truck_choice <= 3:
                 selected_truck = None
                 for truck in trucks_list:
-                    if truck.truck_id == truck_choice:
+                    if truck.get_truck_id() == truck_choice:
                         selected_truck = truck
                         break
                 if selected_truck:
@@ -108,7 +106,7 @@ def delivery_submenu():
                 print("Start delivery first!")
                 ui()
             print("Final status of all packages:")
-            trucks.deliver_packages(trucks_list, graph_access, "8:00 AM", "5:00 PM")
+            trucks.deliver_packages(trucks_list, ds.graph_access, "8:00 AM", "5:00 PM")
             total_miles = 0
             for truck in trucks_list:
                 total_miles += truck.time_tracker.calculate_total_miles_traveled()
@@ -117,22 +115,19 @@ def delivery_submenu():
 
 def visualize_submenu():
     is_address_added = False
-    vis = Visualize(trucks_list)
+    vis = Visualize()
     while True:
         sub_menu = input(
             "[0] Exit\n"
             "[1] Add address\n"
             "[2] Visualize individual package locations\n"
             "[3] Visualize truck routes\n"
-            "[4] Visualize pie chart of package status\n"
+            "[4] Visualize all truck routes\n"
         )
         if sub_menu == "0":
             print("Returning to main menu")
             break
         elif sub_menu == "1":
-            image_path = ('C:/Users/brand/IdeaProjects/Package_Delivery_Program_New/package_delivery/visualization'
-                          '/Picture1.jpg')
-            vis.load_image(image_path)
             while True:
                 print("Truck1, optimized route:", high_priority.route)
                 print("Truck2, optimized route:", medium_priority.route)
@@ -152,15 +147,12 @@ def visualize_submenu():
             print("Select Truck ID(1-3):")
             truck_choice = int(input())
             if 1 <= truck_choice <= 3:
-                image_path = ('C:/Users/brand/IdeaProjects/Package_Delivery_Program_New/package_delivery/visualization'
-                              '/Picture1.jpg')
-                vis.load_image(image_path)
                 vis.get_singe_truck_route(truck_choice)
                 vis.visualize_truck_routes()
             else:
                 print("Invalid Truck ID")
         elif sub_menu == "4":
-            vis.visualize_pie_chart("8:00 AM", "5:00 PM")
+            vis.visualize_all_truck_routes(trucks_list)
         else:
             print("Invalid option, please try again")
 
@@ -181,8 +173,8 @@ def ui():
 
     elif main_menu == "1":
         print("PACKAGES:\n")
-        package_hashmap.print_get_all_packages()
-        value = package_hashmap.check_all_packages()
+        ds.package_hashmap.print_get_all_packages()
+        value = ds.package_hashmap.check_all_packages()
         print("CHECK IF ALL 40 PACKAGES EXIST:", value)
         ui()
     elif main_menu == "2":
@@ -191,7 +183,7 @@ def ui():
             try:
                 id_input = input("Enter package_id: ")
                 id_input_int = int(id_input)
-                print(package_hashmap.get_value_from_key(id_input_int))
+                print(ds.package_hashmap.get_value_from_key(id_input_int))
             except ValueError:
                 print("Please enter valid package_id")
             find_again = input("Enter Y to keep searching: ")

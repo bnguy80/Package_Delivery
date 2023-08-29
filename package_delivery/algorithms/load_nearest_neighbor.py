@@ -49,7 +49,7 @@ def load_packages_nearest_neighbor(trucks, graph, track_package_id):
 
             for package in all_packages:
                 dest_vertex = package.address
-                distance = graph.edge_weight[current_vertex][dest_vertex]
+                distance = graph.get_edge_weight[current_vertex][dest_vertex]
 
                 if distance < min_distance:
                     min_distance = distance
@@ -62,7 +62,7 @@ def load_packages_nearest_neighbor(trucks, graph, track_package_id):
                 track_package_id.add(nearest_package.package_id)
                 all_packages.remove(nearest_package)
             else:
-                print(f"No suitable package found for truck {truck.truck_id}")
+                print(f"No suitable package found for truck {truck.get_truck_id}")
 
         # Return to the hub
         truck.route.append('4001 South 700 East')

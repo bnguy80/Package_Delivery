@@ -7,17 +7,18 @@ class TimeTracker:
     Class to track the time for each truck.
 
     Attributes:
-        TRUCK_SPEED (float): The speed of the truck.
+        __TRUCK_SPEED (float): The speed of the truck.
         track_truck_current_time (dict): Dictionary to track current_time for each truck.
         packages_status (dict): Dictionary to track packages_status for each truck.
         track_miles_traveled (dict): Dictionary to track miles traveled for each truck.
     """
+
     def __init__(self):
         """
         Initialize the TimeTracker object
         """
         # Trucks_speed 18mph -> 0.3 miles per minute
-        self.TRUCK_SPEED = 0.3
+        self.__TRUCK_SPEED = 0.3
         # Dictionary to track current_time for each truck
         self.track_truck_current_time = {}
         # Dictionary of packages on truck and their status; AT_HUB, IN_TRANSIT, or DELIVERED
@@ -26,11 +27,11 @@ class TimeTracker:
         self.track_miles_traveled = {}
 
     # Fixed speed of truck to calculate travel time
-    def get_truck_speed(self):
+    def _get_truck_speed(self):
         """
         Get the speed of the truck.
         """
-        return self.TRUCK_SPEED
+        return self.__TRUCK_SPEED
 
     def insert_current_truck(self, current_truck):
         """
@@ -53,26 +54,6 @@ class TimeTracker:
         elif current_truck == 3:
             # Set truck 3 start time to 0, will be updated when start delivery after truck 1
             self.track_truck_current_time[current_truck] = 0
-
-    # Get all the trucks
-    def get_all_trucks(self):
-        """
-        Returns a list of all trucks.
-        """
-        return list(self.track_truck_current_time.keys())
-
-    def remove_current_truck(self, current_truck):
-        """
-        Removes the current truck from the tracking system.
-
-        Args:
-            current_truck (int): The ID of the truck to be removed.
-
-        Returns:
-            None
-        """
-        del self.track_truck_current_time[current_truck]
-        del self.track_miles_traveled[current_truck]
 
     # Get the status of all packages
     def get_all_package_status(self):
@@ -221,25 +202,6 @@ class TimeTracker:
             if package_info['truck'] == truck_id:
                 package_info['time_to_start_delivery'] = util.float_time_24hr_str(new_time)
 
-    def get_truck_id_for_package(self, package):
-        package_info = self.packages_status.get(package)
-        if package_info:
-            return package_info.get('truck')
-        return None
-
-    # Mark a package as in transit
-    def mark_package_in_transit(self, package):
-        # Get the delivery address of the package
-        destination = package.address
-        # Check if there are other packages with the same delivery address
-        same_address_packages = [
-            pkg for pkg in self.packages_status.keys() if pkg.address == destination
-        ]
-
-        # Update the status of all packages with the same address to 'IN_TRANSIT'
-        for pkg in same_address_packages:
-            self.packages_status[pkg]['status'] = 'IN_TRANSIT'
-
     def get_single_package_status(self, package):
         return self.packages_status[package]
 
@@ -326,7 +288,7 @@ class TimeTracker:
         Returns:
             float: The travel time in minutes.
         """
-        speed = self.get_truck_speed()
+        speed = self._get_truck_speed()
         return distance / speed
 
     # Update current_truck delivery time and insert into delivery_time of package
@@ -378,7 +340,7 @@ class TimeTracker:
             bool: True if the truck is ready to deliver, False otherwise.
         """
         for package, status_info in self.packages_status.items():
-            if status_info['truck'] == current_truck.truck_id and status_info['status'] == 'AT_HUB':
+            if status_info['truck'] == current_truck.get_truck_id and status_info['status'] == 'AT_HUB':
                 return True
         return False
 
@@ -397,86 +359,6 @@ class TimeTracker:
                 if max_time_delivered is None or time_delivered > max_time_delivered:
                     max_time_delivered = time_delivered
         return max_time_delivered is not None
-
-    # Initialize package_status of a package to 'IN_TRANSIT' if time_delivered is having not changed
-    # from the time_loaded of the package
-    def initialize_status_to_in_transit(self, truck_id):
-        """
-        Initialize the status of packages to 'IN_TRANSIT' for a specific truck.
-
-        Parameters:
-            truck_id (int): The ID of the truck.
-
-        Returns:
-            None
-        """
-        address_packages = {}
-        for package, status_info in self.packages_status.items():
-            if status_info['status'] == 'AT_HUB' and status_info['truck'] == truck_id and status_info[
-                'time_delivered'] is None:
-                status_info['status'] = 'IN_TRANSIT'
-                status_info['time_delivered'] = util.float_time_24hr_str(self.track_truck_current_time[truck_id])
-
-                address = package.address
-                package_id = package.package_id
-                if address not in address_packages:
-                    address_packages[address] = [package_id]
-                else:
-                    address_packages[address].append(package_id)
-
-        for address, package_ids in address_packages.items():
-            package_ids_str = ", ".join(str(id) for id in package_ids)
-            print(
-                f"Package IDs: [{package_ids_str}] - Address: {address} - Status: IN_TRANSIT - Truck: {truck_id}, "
-                f"Time_Delivered NOT UPDATED YET: {util.float_time_24hr_str(self.track_truck_current_time[truck_id])}")
-
-    # Update package_status of all packages to 'DELIVERED' after they are delivered
-    def update_delivered_delivery(self, truck_id):
-        """
-        Updates the status of all packages associated with a given truck to 'DELIVERED'.
-
-        Args:
-            truck_id (int): The ID of the truck.
-
-        Returns:
-            None
-        """
-        for package, status_info in self.packages_status.items():
-            if status_info['status'] == 'IN_TRANSIT' and status_info['truck'] == truck_id:
-                status_info['status'] = 'DELIVERED'
-                print(
-                    f"Package ID: {package.package_id} - Package Address: {package.address} - Status: "
-                    f"{status_info}")
-
-    # Print package_status of all packages to 'DELIVERED' after they are delivered
-    def print_delivered_status(self, truck_id):
-        """
-        Prints the delivered status of packages for a given truck.
-
-        Args:
-            truck_id (int): The ID of the truck.
-
-        Returns:
-            str: A string containing the delivered status of packages.
-        """
-        current_time = self.track_truck_current_time[truck_id]
-        formatted_current = util.float_time_24hr_str(current_time)
-        delivered_packages_by_destination = {}
-        for status in self.packages_status.values():
-            if status == 'DELIVERED' and status['truck'] == truck_id:
-                destination = status.package.address
-                package_id = status.package.package_id
-
-                if destination not in delivered_packages_by_destination:
-                    delivered_packages_by_destination[destination] = [package_id]
-                else:
-                    delivered_packages_by_destination[destination].append(package_id)
-
-        result = "Packages delivered:\n"
-        for destination, package_ids in delivered_packages_by_destination.items():
-            result += f"Destination: {destination} Package IDs: {package_ids}\n"
-        result += f"DELIVERY_TIME: {formatted_current}"
-        return result
 
     # Dynamically update the status of packages to 'AT_HUB','IN_TRANSIT','DELIVERED' as the truck travels
     # Should not hard-code the package status to 'AT_HUB','IN_TRANSIT' and 'DELIVERED' to avoid errors

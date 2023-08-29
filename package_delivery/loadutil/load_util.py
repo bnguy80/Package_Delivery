@@ -19,7 +19,7 @@ def get_all_packages_to_load(graph, track_package_id):
         list: The list of packages to load.
     """
     all_packages = []
-    for vertex, packages in graph.vertices.items():
+    for vertex, packages in graph.get_vertices.items():
         for package in packages:
             if package.package_id not in track_package_id:
                 all_packages.append(package)
@@ -48,7 +48,7 @@ def can_load_packages(truck, package):
 
     # Check if the package has a deadline of 9:00 AM or is one of the packages that must be delivered together
     elif delivery_deadline == '9:00 AM' or package_id in [15, 14, 19, 16, 13, 20]:
-        if truck.truck_id == 1:
+        if truck.get_truck_id == 1:
             return True
         return False
 
@@ -56,13 +56,13 @@ def can_load_packages(truck, package):
     elif delivery_deadline == '10:30AM' or special_notes == 'Can only be on truck 2' or special_notes == ('Wrong '
                                                                                                           'address '
                                                                                                           'listed'):
-        if truck.truck_id == 2:
+        if truck.get_truck_id == 2:
             return True
         return False
 
     # If the package has a deadline of EOD or is delayed on flight, it can be loaded on truck 3
     elif delivery_deadline == 'EOD' or special_notes == 'Delayed on flight---will not arrive to depot until 9:05 am':
-        if truck.truck_id == 3:
+        if truck.get_truck_id == 3:
             return True
 
     return False  # Return False if none of the constraints are met
@@ -122,7 +122,7 @@ def sort_packages_by_distance(truck, remaining_packages, graph):
         None
     """
     current_vertex = truck.route[-1]
-    remaining_packages.sort(key=lambda package: graph.edge_weight[current_vertex][package.address])
+    remaining_packages.sort(key=lambda package: graph.get_edge_weight[current_vertex][package.address])
 
 
 # Load packages onto trucks with specific delivery_deadline and constraints required for each truck
@@ -227,7 +227,7 @@ def get_left_over_packages(graph, track_package_id):
         list: The list of packages that are not being tracked.
     """
     left_over = []
-    for vertex, packages in graph.vertices.items():
+    for vertex, packages in graph.get_vertices.items():
         for package in packages:
             if package.package_id not in track_package_id:
                 left_over.append(package)
@@ -275,7 +275,7 @@ def load_left_over_packages(trucks, left_over, track_package_id):
             # Check if the package has special note 'Can only be on truck 2'
             elif package_left.special_notes == 'Can only be on truck 2':
                 # Check if the current truck is truck 2
-                if trucks.truck_id == 2:
+                if trucks.get_truck_id == 2:
                     # Insert the package into the truck
                     trucks.insert_packages(package_left)
                     # Add the package_id to the track_package_id set
@@ -287,7 +287,7 @@ def load_left_over_packages(trucks, left_over, track_package_id):
             # Check if the package has special note 'Delayed on flight---will not arrive to depot until 9:05 am'
             elif package_left.special_notes == 'Delayed on flight---will not arrive to depot until 9:05 am':
                 # Check if the current truck is truck 3
-                if trucks.truck_id == 3:
+                if trucks.get_truck_id == 3:
                     # Insert the package into the truck
                     trucks.insert_packages(package_left)
                     # Add the package_id to the track_package_id set
@@ -323,7 +323,7 @@ def get_package_deadline_constraints_low_asc(graph, delivery_deadline):
     selected_packages_ids = set()
     # Iterate over all vertices and their associated packages in the graph
     # key vertex(address): values(list of associated packages with vertex)
-    for vertex, packages in graph.vertices.items():
+    for vertex, packages in graph.get_vertices.items():
         # Iterate over each package associated with the current vertex
         for package in packages:
             # Checks if package with specified delivery_deadline match
@@ -355,7 +355,7 @@ def get_package_deadline_constraints_med_asc(graph, delivery_deadline, constrain
     # Set that will store the package_id's of the selected packages
     # to avoid duplicates in the list of packages returned
     selected_package_ids = set()
-    for vertex, packages in graph.vertices.items():
+    for vertex, packages in graph.get_vertices.items():
         for package in packages:
             # Checks if package_id is in the specified constraints list or delivery_deadline match
             if package.special_notes == constraints or package.package_id in constraints_list or package.delivery_deadline == delivery_deadline:
@@ -386,7 +386,7 @@ def get_package_deadline_constraints_high_asc(graph, constraints, delivery_deadl
     # Set that will store the package_id's of the selected packages
     # to avoid duplicates in the list of packages returned
     selected_package_ids = set()
-    for vertex, packages in graph.vertices.items():
+    for vertex, packages in graph.get_vertices.items():
         for package in packages:
             if package.package_id in constraints or package.delivery_deadline == delivery_deadline:
                 if package.package_id not in selected_package_ids:

@@ -2,13 +2,12 @@ import matplotlib.pyplot as plt
 
 
 class Visualize:
-    def __init__(self, trucks):
-        self.image_path = None
+    def __init__(self):
+        self.__IMAGE_PATH = ('C:/Users/brand/IdeaProjects/Package_Delivery_Program_New/package_delivery/visualization'
+                             '/Picture1.jpg')
         self.route = {}
-        # A list of trucks objects
-        self.trucks_list = trucks
         # All coordinates (x, y) dictionary; visualize a Picture1.jpg dimensions 672x756
-        self.ALL_COORDINATES = {
+        self.__ALL_COORDINATES = {
             '4001 South 700 East': (397, 457),
             '195 W Oakland Ave': (309, 316),
             '2530 S 500 E': (372, 320),
@@ -38,18 +37,6 @@ class Visualize:
             '4300 S 1300 E': (447, 490)
         }
 
-    def load_image(self, filename):
-        """
-        Load a visualization from a given file.
-
-        Parameters:
-            filename (str): The path to the visualization file.
-
-        Returns:
-            None
-        """
-        self.image_path = filename
-
     def add_route_coord(self, address):
         """
         Adds a route coordinate to the `route` dictionary.
@@ -63,8 +50,8 @@ class Visualize:
         Raises:
             None
         """
-        if address in self.ALL_COORDINATES:
-            self.route[address] = self.ALL_COORDINATES[address]
+        if address in self.__ALL_COORDINATES:
+            self.route[address] = self.__ALL_COORDINATES[address]
         else:
             print("Invalid address: ", {address})
 
@@ -76,37 +63,22 @@ class Visualize:
             Tuple: The x and y coordinates of the route.
         """
         x, y = zip(*self.route.values())
+        # Close the route by adding the first and last coordinates
         if x[0] != x[-1] or y[0] != y[-1]:
             x = x + (x[0],)
             y = y + (y[0],)
         return x, y
 
-    def get_singe_truck_route(self, truck_id):
-        """
-        Get the route for a single truck.
-
-        Parameters:
-            truck_id (int): The ID of the truck.
-
-        Returns:
-            None
-        """
-        truck = None
-        if truck_id == 1:
-            truck = self.trucks_list[0]
-        elif truck_id == 2:
-            truck = self.trucks_list[1]
-        elif truck_id == 3:
-            truck = self.trucks_list[2]
+    def get_singe_truck_route(self, truck):
         if truck is not None:
-            print(f"Fetching routes for truck {truck_id}...")  # Debug line
+            print(f"Fetching routes for truck {truck.get_truck_id}...")  # Debug line
             for route in truck.route:
                 print(f"Adding route address: {route}")  # Debug line
                 self.add_route_coord(route)
         else:
-            print(f"Invalid truck ID: {truck_id}")  # Debug line
+            print(f"Invalid truck: {truck}")  # Debug line
 
-    # visualize package locations
+    # Visualize package locations
     def visualize_package_locations(self):
         """
         Visualize the package locations.
@@ -124,7 +96,7 @@ class Visualize:
         - None
         """
         # Read the file
-        image = plt.imread(self.image_path)
+        image = plt.imread(self.__IMAGE_PATH)
         # Create a figure with the original dimensions
         fig, ax = plt.subplots(figsize=(image.shape[1] / 100, image.shape[0] / 100))
         # Display the visualization with SciView
@@ -159,7 +131,7 @@ class Visualize:
         Returns:
         - None
         """
-        image = plt.imread(self.image_path)
+        image = plt.imread(self.__IMAGE_PATH)
         fig, ax = plt.subplots(figsize=(image.shape[1] / 100, image.shape[0] / 100))
         ax.imshow(image)
 
@@ -176,13 +148,13 @@ class Visualize:
         # Clears the route for the next visualization
         self.route = {}
 
-    def visualize_all_truck_routes(self):
-        image = plt.imread(self.image_path)
+    def visualize_all_truck_routes(self, trucks_list):
+        image = plt.imread(self.__IMAGE_PATH)
         fig, ax = plt.subplots(figsize=(image.shape[1] / 100, image.shape[0] / 100))
         ax.imshow(image)
 
         colors = ['red', 'blue', 'green']
-        for idx, truck in enumerate(self.trucks_list):
+        for idx, truck in enumerate(trucks_list):
             # Reset the route for each truck
             self.route = {}
             for route in truck.route:
@@ -190,7 +162,7 @@ class Visualize:
 
             x, y = self._get_coord_and_close_route()
 
-            ax.scatter(x, y, marker='o', color=colors[idx], s=50, label=truck.truck_id)
+            ax.scatter(x, y, marker='o', color=colors[idx], s=50, label=truck.get_truck_id)
             ax.plot(x, y, color=colors[idx], linestyle='dashed', linewidth=2)
         ax.legend(loc='upper right', shadow=True)
         ax.axis('off')
@@ -208,13 +180,9 @@ class Visualize:
         # Pie chart, where the slices will be ordered and plotted counter-clockwise:
         labels = list(status_count.keys())
         sizes = list(status_count.values())
-        colors = ['gold', 'yellowgreen', 'lightcoral']
+        colors = ['gold', 'red', 'green']
         explode = (0.1, 0.1, 0.1)
         plt.pie(sizes, explode=explode, labels=labels, colors=colors, autopct='%1.1f%%', shadow=True, startangle=90)
         plt.axis('equal')
         plt.title(f'{truck_title} Package Status Distribution, {start_interval} - {end_interval}')
         plt.show()
-
-# trucks_list1 = [high_priority, medium_priority, low_priority]
-# vis = Visualize(trucks_list1)
-# vis.load_image('C:/Users/brand/IdeaProjects/Package_Delivery_Program_New/package_delivery/visualization/Picture1.jpg')
