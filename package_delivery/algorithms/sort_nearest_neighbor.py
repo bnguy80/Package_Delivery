@@ -43,7 +43,7 @@ def sort_packages_on_truck(trucks, graph):
             dest_vertex = package.address
             # Calculate the distance between the current vertex and the destination vertex by looking up the distance in
             # the graph object using the current vertex and destination vertex as keys
-            distance = graph.edge_weight[current_vertex][dest_vertex]
+            distance = graph.get_edge_weight[current_vertex][dest_vertex]
             # If the distance is less than the minimum distance, update the minimum distance and nearest package
             if distance < min_distance:
                 min_distance = distance

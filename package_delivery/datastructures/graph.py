@@ -10,8 +10,8 @@ class Graph:
     each package.
 
     Attributes:
-        vertices (dict): Dictionary of all vertices, which will be street address and their associated packages
-        edge_weight (dict): Dictionary that will act as an adjacency list. Store edges and their weights between
+        __vertices (dict): Dictionary of all vertices, which will be street address and their associated packages
+        __edge_weight (dict): Dictionary that will act as an adjacency list. Store edges and their weights between
         vertices
     """
 
@@ -19,8 +19,8 @@ class Graph:
         """
         Initialize the graph object
         """
-        self.vertices = {}  # Dictionary of all vertices, which will be street address and their associated packages
-        self.edge_weight = {}  # Dictionary that will act as an adjacency list. Store edges and their weights between
+        self.__vertices = {}  # Dictionary of all vertices, which will be street address and their associated packages
+        self.__edge_weight = {}  # Dictionary that will act as an adjacency list. Store edges and their weights between
         # vertices
 
     # Add new vertices to the graph.
@@ -34,16 +34,27 @@ class Graph:
             vertex (str): The vertex to be added to the graph.
 
         """
-        self.vertices[vertex] = []
+        self.__vertices[vertex] = []
 
-    def get_all_vertices(self):
+    @property
+    def get_vertices(self):
         """
         Get all vertices in the graph.
 
         Returns:
             A view object containing all the vertices in the graph.
         """
-        return self.vertices.items()
+        return self.__vertices
+
+    @property
+    def get_edge_weight(self):
+        """
+        Get the-edge weight.
+
+        Returns:
+            dict: The-edge weight
+        """
+        return self.__edge_weight
 
     # Add edges between vertex1 and vertex2, and the weight between them
     # Creates dictionaries for vertex1 and vertex2 and inner dictionaries for vertex1 and vertex2
@@ -62,14 +73,14 @@ class Graph:
         """
         # self.edge_weight = [(edges)] = weight
         # Checks if vertex1 and vertex2 exist in the vertices dictionary
-        if vertex1 in self.vertices and vertex2 in self.vertices:
+        if vertex1 in self.__vertices and vertex2 in self.__vertices:
             # If vertex1 not already in the dictionary, then create an empty inner dictionary for vertex1
-            if vertex1 not in self.edge_weight:
-                self.edge_weight[vertex1] = {}
+            if vertex1 not in self.__edge_weight:
+                self.__edge_weight[vertex1] = {}
             # If vertex2 not already in the dictionary, then create an empty inner dictionary for vertex2
-            if vertex2 not in self.edge_weight:
-                self.edge_weight[vertex2] = {}
-            self.edge_weight[vertex1][
+            if vertex2 not in self.__edge_weight:
+                self.__edge_weight[vertex2] = {}
+            self.__edge_weight[vertex1][
                 # Add vertex2 as the key to the inner dictionary of vertex1 with weight as the value -> key-value pair
                 vertex2] = weight
             # Add vertex1 as the key of the inner dictionary of vertex2 with weight as the
@@ -77,7 +88,7 @@ class Graph:
             # if vertex1 != vertex2: # If vertex1 and vertex2 are not the same, add vertex1 as key of the inner
             # dictionary of vertex2 with weight as the value -> key-value pair self.edge_weight[vertex2][vertex1] =
             # weight
-            self.edge_weight[vertex2][vertex1] = weight
+            self.__edge_weight[vertex2][vertex1] = weight
             return True
         else:
             return False
@@ -96,18 +107,18 @@ class Graph:
             for item in bucket:
                 package_package = item[1].address
                 package = item[1]
-                if package_package in self.vertices:
-                    self.vertices[package_package].append(package)
+                if package_package in self.__vertices:
+                    self.__vertices[package_package].append(package)
                 else:
-                    self.vertices[package_package] = [package]
+                    self.__vertices[package_package] = [package]
 
-        for address, packages in self.vertices.items():
+        for address, packages in self.__vertices.items():
             for package in packages:
-                if package.address in self.edge_weight:
-                    package.edge_weight = self.edge_weight[package.address]
+                if package.address in self.__edge_weight:
+                    package.edge_weight = self.__edge_weight[package.address]
                     break
             else:
-                for vertex1, edges in self.edge_weight.items():
+                for vertex1, edges in self.__edge_weight.items():
                     for vertex2, weight in edges.items():
                         if package.address == vertex1 or package.address == vertex2:
                             package.edge_weight = weight
@@ -169,7 +180,7 @@ class Graph:
             None
         """
         # Iterates over each vertex to retrieve edges and weights
-        for vertex1, edges in self.edge_weight.items():
+        for vertex1, edges in self.__edge_weight.items():
             # Inner loop, prints src vertex(vertex1),dest vertex(vertex2), and weight of the edge
             for vertex2, weight in edges.items():
                 print(f"Edge: {vertex1} -> {vertex2}, Weight: {weight}")
@@ -190,11 +201,11 @@ class Graph:
         Returns:
             None
         """
-        [print(f"Edge: {vertex1} -> {vertex2}, Weight: {weight}") for vertex1, edges in self.edge_weight.items() for
+        [print(f"Edge: {vertex1} -> {vertex2}, Weight: {weight}") for vertex1, edges in self.__edge_weight.items() for
          vertex2, weight in edges.items()]
         [print(f"Edge: {vertex1} -> {vertex2}, Associated Package: {package}") for vertex1, edges in
-         self.edge_weight.items() for vertex2, weight in edges.items() if vertex1 in
-         self.vertices for package in self.vertices[vertex1]]
+         self.__edge_weight.items() for vertex2, weight in edges.items() if vertex1 in
+         self.__vertices for package in self.__vertices[vertex1]]
         print()
 
     # Print the vertices and associated packages in a human-readable format
@@ -205,7 +216,7 @@ class Graph:
         Returns:
             None
         """
-        for vertex, packages in self.vertices.items():
+        for vertex, packages in self.__vertices.items():
             print(f"Vertex: {vertex}")
             for package in packages:  # Key-value pair print
                 print(f"  - Package ID: {package.package_id}")
@@ -224,7 +235,7 @@ class Graph:
         Returns:
             None
         """
-        for vertex, packages in self.vertices.items():
+        for vertex, packages in self.__vertices.items():
             for package in packages:
                 # Check if the package has the specified deadline in its
                 # deadline attribute

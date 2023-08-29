@@ -29,7 +29,7 @@ def calculate_route_distance(route, graph):
     for i in range(len(route) - 1):
         from_vertex = route[i]
         to_vertex = route[i + 1]
-        total_distance += graph.edge_weight[from_vertex][to_vertex]
+        total_distance += graph.get_edge_weight[from_vertex][to_vertex]
     return total_distance
 
 
