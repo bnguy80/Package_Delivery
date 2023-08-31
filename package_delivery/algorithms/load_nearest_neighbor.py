@@ -62,7 +62,8 @@ def load_packages_nearest_neighbor(trucks, graph, track_package_id):
                 track_package_id.add(nearest_package.package_id)
                 all_packages.remove(nearest_package)
             else:
-                print(f"No suitable package found for truck {truck.get_truck_id}")
+                print(f"No suitable package found for truck {truck.truck_id}")
 
         # Return to the hub
         truck.route.append('4001 South 700 East')
+        truck.visualize.update_address(truck.route)
