@@ -48,7 +48,7 @@ def can_load_packages(truck, package):
 
     # Check if the package has a deadline of 9:00 AM or is one of the packages that must be delivered together
     elif delivery_deadline == '9:00 AM' or package_id in [15, 14, 19, 16, 13, 20]:
-        if truck.get_truck_id == 1:
+        if truck.truck_id == 1:
             return True
         return False
 
@@ -56,13 +56,13 @@ def can_load_packages(truck, package):
     elif delivery_deadline == '10:30AM' or special_notes == 'Can only be on truck 2' or special_notes == ('Wrong '
                                                                                                           'address '
                                                                                                           'listed'):
-        if truck.get_truck_id == 2:
+        if truck.truck_id == 2:
             return True
         return False
 
     # If the package has a deadline of EOD or is delayed on flight, it can be loaded on truck 3
     elif delivery_deadline == 'EOD' or special_notes == 'Delayed on flight---will not arrive to depot until 9:05 am':
-        if truck.get_truck_id == 3:
+        if truck.truck_id == 3:
             return True
 
     return False  # Return False if none of the constraints are met
@@ -275,7 +275,7 @@ def load_left_over_packages(trucks, left_over, track_package_id):
             # Check if the package has special note 'Can only be on truck 2'
             elif package_left.special_notes == 'Can only be on truck 2':
                 # Check if the current truck is truck 2
-                if trucks.get_truck_id == 2:
+                if trucks.truck_id == 2:
                     # Insert the package into the truck
                     trucks.insert_packages(package_left)
                     # Add the package_id to the track_package_id set
@@ -287,7 +287,7 @@ def load_left_over_packages(trucks, left_over, track_package_id):
             # Check if the package has special note 'Delayed on flight---will not arrive to depot until 9:05 am'
             elif package_left.special_notes == 'Delayed on flight---will not arrive to depot until 9:05 am':
                 # Check if the current truck is truck 3
-                if trucks.get_truck_id == 3:
+                if trucks.truck_id == 3:
                     # Insert the package into the truck
                     trucks.insert_packages(package_left)
                     # Add the package_id to the track_package_id set

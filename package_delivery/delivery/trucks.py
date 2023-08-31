@@ -49,16 +49,17 @@ class Trucks:
         self.route = []
         self.distances = []
         self.pred_vertex = []
-        # Composition, Trucks object 'has a' TimeTracker object relationship to track status of packages
-        self.time_tracker = TimeTracker()
-        # Composition, Trucks object 'has a' Visualize object relationship to visualize delivery
-        self.visualize = Visualize()
         # Associate truck ID with Trucks object
         self.__truck_id = truck_id
         self.__truck_name = truck_name
+        # Composite class relationship, Trucks object 'has a' TimeTracker object relationship to track the status of
+        # packages
+        self.time_tracker = TimeTracker(self.__truck_id)
+        # Composite class relationship, Trucks object 'has a' Visualize object relationship to visualize delivery
+        self.visualize = Visualize(self.route, self.__truck_id, self.__truck_name)
 
     @property
-    def get_truck_id(self):
+    def truck_id(self):
         """
         Get the truck ID.
 
@@ -68,7 +69,7 @@ class Trucks:
         return self.__truck_id
 
     @property
-    def get_truck_name(self):
+    def truck_name(self):
         """
         Gets the name of the truck.
 
@@ -236,11 +237,11 @@ def _find_shortest_route_to_deliver(truck, graph):
         # Insert the calculated distances and pred_vertex into the Trucks object
         truck.insert_distances_pred_vertex(distances1[dest_vertex], pred_vertex1[dest_vertex])
         # Update time during delivery
-        time_delivered = truck.time_tracker.update_current_truck_time(distances1[dest_vertex], truck.get_truck_id)
+        time_delivered = truck.time_tracker.update_current_truck_time(distances1[dest_vertex], truck.truck_id)
         # Insert the time_delivered into package
         truck.time_tracker.insert_current_truck_time_to_package(package, time_delivered)
         # Update the time for other packages with the same address
-        for other_package, status_info in truck.time_tracker.packages_status.items():
+        for other_package, status_info in truck.time_tracker.package_status.items():
             if (other_package != package and other_package.address == package.address and status_info['status'] !=
                     'DELIVERED'):
                 truck.time_tracker.insert_current_truck_time_to_package(other_package, time_delivered)
@@ -273,9 +274,7 @@ def deliver_packages(trucks, graph, start_interval, end_interval):
         # Current truck time tracker high_priority, medium_priority, low_priority
         time_tracker = current_truck.time_tracker
         # Get the name of the current truck
-        truck_name = current_truck.get_truck_name
-        # Initialize tracking trucks
-        time_tracker.insert_current_truck(current_truck.get_truck_id)
+        truck_name = current_truck.truck_name
         print("NEW LINE---\n")
         # Check if the current truck is ready for delivery
         if current_truck.time_tracker.is_ready_to_deliver(current_truck):
@@ -289,20 +288,18 @@ def deliver_packages(trucks, graph, start_interval, end_interval):
                 # Call the function to find the shortest route to deliver packages
                 total_distance = _find_shortest_route_to_deliver(current_truck, graph)
                 # Update miles traveled for the current truck
-                time_tracker.update_miles_traveled(total_distance, current_truck.get_truck_id)
+                time_tracker.update_miles_traveled(total_distance, current_truck.truck_id)
 
             # Check if the start time is 9:35 AM and update at 10:20 AM
             # If so, update the package with ID 9 to the new address
-            if start_interval == '9:35 AM':
-                package_to_update = ds.package_hashmap.get_value_from_key(9)  # Get the package object
-                new_address = '410 S State St'
-                new_city = 'Salt Lake City'
-                new_state = 'UT'
-                new_zipcode = '84111'
-                new_special_notes = 'Address updated from 300 State St to 410 S State St'
-                time_tracker.update_package_status(package_to_update, new_address, new_city, new_state, new_zipcode,
-                                                   new_special_notes)
-                print("PACKAGE UPDATED, Address updated from 300 State St to 410 S State St: #9")
+            package_to_update = ds.package_hashmap.get_value_from_key(9)  # Get the package object
+            new_address = '410 S State St'
+            new_city = 'Salt Lake City'
+            new_state = 'UT'
+            new_zipcode = '84111'
+            new_special_notes = 'Address updated from 300 State St to 410 S State St'
+            time_tracker.update_package_status(package_to_update, new_address, new_city, new_state, new_zipcode,
+                                               new_special_notes, start_interval)
 
             # Check if truck 1 has completed its delivery
             if current_truck == high_priority and current_truck.time_tracker.is_delivery_completed():
@@ -319,7 +316,7 @@ def deliver_packages(trucks, graph, start_interval, end_interval):
                 print("FILTERED_PACKAGES:", filtered_packages)
                 print("TRUCK ROUTE:", current_truck.route)
                 current_truck.visualize.visualize_pie_chart(filtered_packages, truck_name, start_interval, end_interval)
-                time_tracker.print_current_truck_miles(current_truck.get_truck_id)
+                time_tracker.print_current_truck_miles(current_truck.truck_id)
 
 
 # After truck 1's delivery is completed, deliver truck 3's packages
@@ -336,16 +333,16 @@ def deliver_truck3_packages(truck3, graph, start_interval, end_interval):
     Returns:
         None
     """
-    truck_name = truck3.get_truck_name
+    truck_name = truck3.truck_name
     time_tracker = truck3.time_tracker
     # Calculate start time for truck 3 based on truck 1's return time
-    current_time_truck1 = high_priority.time_tracker.get_current_truck_time(high_priority.get_truck_id)
+    current_time_truck1 = high_priority.time_tracker.get_current_truck_time(high_priority.truck_id)
     truck3_start_time = current_time_truck1
 
     # Update truck 3's time to account for delivering packages after truck1
     # and update time_to_start_delivery
-    time_tracker.track_truck_current_time[truck3.get_truck_id] = truck3_start_time
-    time_tracker.update_time_to_start_delivery(truck3.get_truck_id, truck3_start_time)
+    time_tracker.set_track_truck_current_time(truck3.truck_id, truck3_start_time)
+    time_tracker.update_time_to_start_delivery(truck3.truck_id, truck3_start_time)
 
     print("Truck 3: Starting deliveries.")
     # print(f"{truck.get_truck_name}, OPTIMIZED_DELIVERY_ROUTE: ", truck3.route)
@@ -354,13 +351,13 @@ def deliver_truck3_packages(truck3, graph, start_interval, end_interval):
     # Call the function to find the shortest route to deliver packages
     total_distance = _find_shortest_route_to_deliver(truck3, graph)
     # Update miles traveled for the current truck
-    time_tracker.update_miles_traveled(total_distance, truck3.get_truck_id)
+    time_tracker.update_miles_traveled(total_distance, truck3.truck_id)
 
     filtered_packages = truck3.time_tracker.filter_packages_by_time_range(start_interval, end_interval)
     print("Start time:", start_interval, "End time:", end_interval)
     print("FILTERED_PACKAGES:", filtered_packages)
     truck3.visualize.visualize_pie_chart(filtered_packages, truck_name, start_interval, end_interval)
-    time_tracker.print_current_truck_miles(truck3.get_truck_id)
+    time_tracker.print_current_truck_miles(truck3.truck_id)
 
 
 # Delivered by 9:00am, the constraint of having multiple packages on the same truck delivered together, Truck 1
@@ -382,10 +379,12 @@ medium_priority.time_tracker.initialize_multiple_package_status(medium_priority.
 low_priority.time_tracker.initialize_multiple_package_status(low_priority.get_packages(), 'AT_HUB', 3, 8.0)
 
 trucks_list = [high_priority, medium_priority, low_priority]
-deliver_packages(trucks_list, ds.graph_access, '8:25 AM', '9:35 AM')
-high_priority.visualize.get_singe_truck_route(high_priority)
-high_priority.visualize.visualize_truck_routes()
+deliver_packages(trucks_list, ds.graph_access, '12:03 PM', '1:12 PM')
 high_priority.visualize.visualize_all_truck_routes(trucks_list)
+high_priority.visualize.visualize_truck_route()
+# medium_priority.visualize.visualize_truck_route()
+# low_priority.visualize.visualize_truck_route()
+
 #
 # # Working on to calculate total miles traveled of all trucks
 # total_miles_traveled = 0

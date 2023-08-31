@@ -4,7 +4,7 @@ from package_delivery.trackingutil import tracking_util as util
 
 class TimeTracker:
     """
-    Class to track the time for each truck.
+    Class to track the time for each truck. Componite of Trucks class
 
     Attributes:
         __TRUCK_SPEED (float): The speed of the truck.
@@ -13,9 +13,12 @@ class TimeTracker:
         track_miles_traveled (dict): Dictionary to track miles traveled for each truck.
     """
 
-    def __init__(self):
+    def __init__(self, truck_id):
         """
         Initialize the TimeTracker object
+
+        Parameters:
+            truck_id (int): The ID of the truck
         """
         # Trucks_speed 18mph -> 0.3 miles per minute
         self.__TRUCK_SPEED = 0.3
@@ -26,6 +29,17 @@ class TimeTracker:
         # Dictionary to track miles traveled by each truck
         self.track_miles_traveled = {}
 
+        # Initialize miles_traveled for each truck to 0
+        self.track_miles_traveled[truck_id] = 0
+
+        # Set the current time for each truck based on its truck ID
+        if truck_id == 1:
+            self.track_truck_current_time[truck_id] = 8.0  # Set truck 1 start time to string 8:00 AM
+        elif truck_id == 2:
+            self.track_truck_current_time[truck_id] = 9.083333  # Set truck 2 start time 9:05 AM
+        elif truck_id == 3:
+            self.track_truck_current_time[truck_id] = 0  # Set truck 3 start time to zero will be updated when start delivery after truck 1
+
     # Fixed speed of truck to calculate travel time
     def _get_truck_speed(self):
         """
@@ -33,30 +47,11 @@ class TimeTracker:
         """
         return self.__TRUCK_SPEED
 
-    def insert_current_truck(self, current_truck):
-        """
-        Initializes the miles traveled for the current truck to 0.
-        Sets the current time for the current truck based on its truck ID.
 
-        Parameters:
-            current_truck (int): The ID of the current truck.
-
-        Returns:
-            None
-        """
-        # Initialize miles_traveled for current truck to 0
-        self.track_miles_traveled[current_truck] = 0
-        # Set the current time for the current truck based on its truck ID
-        if current_truck == 1:
-            self.track_truck_current_time[current_truck] = 8.0  # Set truck 1 start time to string 8:00
-        elif current_truck == 2:
-            self.track_truck_current_time[current_truck] = 9.083333  # Set truck 2 start time to string 9:05
-        elif current_truck == 3:
-            # Set truck 3 start time to 0, will be updated when start delivery after truck 1
-            self.track_truck_current_time[current_truck] = 0
 
     # Get the status of all packages
-    def get_all_package_status(self):
+    @property
+    def package_status(self):
         """
         Get all package statuses.
 
@@ -64,6 +59,25 @@ class TimeTracker:
             The package status.
         """
         return self.packages_status
+
+    def set_track_truck_current_time(self, truck_id, new_time):
+        """
+        Sets the current time for a specified truck.
+
+        Parameters:
+            truck_id (int): The ID of the truck.
+            new_time (datetime): The new current time to set for the truck.
+
+        Raises:
+            ValueError: If the current time is not updated.
+
+        Returns:
+            None
+        """
+        if truck_id in self.track_truck_current_time and self.track_truck_current_time[truck_id] != new_time:
+            self.track_truck_current_time[truck_id] = new_time
+        else:
+            raise ValueError("Current time not updated")
 
     # Lookup single package status by package_id and current_time to determine if package is delivered or in transit
     def lookup_single_package_status(self, package_id, current_time):
@@ -99,7 +113,7 @@ class TimeTracker:
 
     # Update package in package_status dictionary
 
-    def update_package_status(self, package, new_address, new_city, new_state, new_zipcode, new_special_notes):
+    def update_package_status(self, package, new_address, new_city, new_state, new_zipcode, new_special_notes, current_time):
         """
         Updates the status of a package in the package status dictionary.
 
@@ -114,31 +128,31 @@ class TimeTracker:
         Returns:
         - bool: True if the package status was successfully updated, False otherwise.
         """
-        if package in self.packages_status:
-            # Get the old status
-            old_status = self.packages_status[package]
 
-            # Create the updated package with new information
-            updated_package = HashMapEntry(
-                package.package_id,
-                new_address,
-                new_city,
-                new_state,
-                new_zipcode,
-                package.delivery_deadline,
-                package.mass,
-                new_special_notes
-            )
+        time = util.convert_12h_to_24h_datetime(current_time)
+        target_time = util.convert_12h_to_24h_datetime('9:35 AM')
+        if time >= target_time:
+            if package in self.packages_status:
+                # Get the old status
+                old_status = self.packages_status[package]
 
-            # Update the package status dictionary
-            self.packages_status[updated_package] = old_status
-
-            # Remove the old key if necessary
-            if updated_package != package:
+                # Create the updated package with new information
+                updated_package = HashMapEntry(
+                    package.package_id,
+                    new_address,
+                    new_city,
+                    new_state,
+                    new_zipcode,
+                    package.delivery_deadline,
+                    package.mass,
+                    new_special_notes
+                )
+                # Remove old package entry
                 del self.packages_status[package]
+                # Update the package status dictionary
+                self.packages_status[updated_package] = old_status
 
-            return True
-        return False
+                print("PACKAGE UPDATED, Address updated from 300 State St to 410 S State St: #9")
 
     # See the status of all packages during the day
     def print_all_package_status(self):
@@ -340,7 +354,7 @@ class TimeTracker:
             bool: True if the truck is ready to deliver, False otherwise.
         """
         for package, status_info in self.packages_status.items():
-            if status_info['truck'] == current_truck.get_truck_id and status_info['status'] == 'AT_HUB':
+            if status_info['truck'] == current_truck.truck_id and status_info['status'] == 'AT_HUB':
                 return True
         return False
 

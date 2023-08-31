@@ -2,10 +2,20 @@ import matplotlib.pyplot as plt
 
 
 class Visualize:
-    def __init__(self):
+    COLORS = ['red', 'blue', 'green']  # High Priority, Medium Priority, Low Priority
+    LINE_STYLES = ['-', '--', ':']  # Solid, Dashed, Dotted line styles
+    MARKERS = ['o', 's', '^']  # Circle, Square, Triangle markers
+
+    def __init__(self, addresses, truck_id, truck_name):
+        """
+        Initialize the Visualize object
+        """
         self.__IMAGE_PATH = ('C:/Users/brand/IdeaProjects/Package_Delivery_Program_New/package_delivery/visualization'
                              '/Picture1.jpg')
         self.route = {}
+        self.addresses = addresses
+        self.truck_id = truck_id
+        self.truck_name = truck_name
         # All coordinates (x, y) dictionary; visualize a Picture1.jpg dimensions 672x756
         self.__ALL_COORDINATES = {
             '4001 South 700 East': (397, 457),
@@ -36,24 +46,55 @@ class Visualize:
             '2300 Parkway Blvd': (130, 325),
             '4300 S 1300 E': (447, 490)
         }
+        # Create a figure and axes
+        self.fig, self.ax = None, None
+        # Create a scatter plot
+        self.scatter = None
+        # Create a line plot
+        self.line = None
 
-    def add_route_coord(self, address):
+    def _setup_figure(self):
+        idx = (self.truck_id - 1) % 3
+        # Read the image
+        image = plt.imread(self.__IMAGE_PATH)
+        # Create a figure with the original dimensions
+        self.fig, self.ax = plt.subplots(figsize=(image.shape[1] / 100, image.shape[0] / 100))
+        # Display the image
+        self.ax.imshow(image)
+        # Turn off axes
+        self.ax.axis('off')
+        # Set the scatter plot
+        self.scatter = self.ax.scatter([], [], marker=self.MARKERS[idx], color=self.COLORS[idx], s=50)
+        # Set the line plot
+        self.line, = self.ax.plot([], [], color=self.COLORS[idx], linestyle=self.LINE_STYLES[idx], linewidth=2)
+
+    # Get all coordinates from the addresses
+    def _populate_route_dict(self):
         """
-        Adds a route coordinate to the `route` dictionary.
+        Populates the route dictionary with the addresses and their corresponding coordinates.
+
+        Parameters:
+        - None
+
+        Returns:
+        - None
+        """
+        for address in self.addresses:
+            if address in self.__ALL_COORDINATES:
+                self.route[address] = self.__ALL_COORDINATES[address]
+
+    # Update after two_opt_swap and load_packages_nearest_neighbor used
+    def update_address(self, new_addresses):
+        """
+        Update the address attribute of the object.
 
         Args:
-            address (str): The address of the route coordinate.
+            new_addresses (str): The new addresses to be assigned to the address attribute.
 
         Returns:
             None
-
-        Raises:
-            None
         """
-        if address in self.__ALL_COORDINATES:
-            self.route[address] = self.__ALL_COORDINATES[address]
-        else:
-            print("Invalid address: ", {address})
+        self.addresses = new_addresses
 
     def _get_coord_and_close_route(self):
         """
@@ -69,104 +110,83 @@ class Visualize:
             y = y + (y[0],)
         return x, y
 
-    def get_singe_truck_route(self, truck):
-        if truck is not None:
-            print(f"Fetching routes for truck {truck.get_truck_id}...")  # Debug line
-            for route in truck.route:
-                print(f"Adding route address: {route}")  # Debug line
-                self.add_route_coord(route)
-        else:
-            print(f"Invalid truck: {truck}")  # Debug line
-
     # Visualize package locations
     def visualize_package_locations(self):
-        """
-        Visualize the package locations.
-
-        This function reads a file specified by `self.image_path`
-        and displays the visualization using the `imshow` function from the `matplotlib.pyplot` library.
-        It then overlays markers on the visualization to represent the package locations.
-        The coordinates of the package locations are obtained from the `self.route` dictionary.
-        Each package location is represented by a marker with the shape of a circle.
-
-        Parameters:
-        - None
-
-        Returns:
-        - None
-        """
-        # Read the file
-        image = plt.imread(self.__IMAGE_PATH)
-        # Create a figure with the original dimensions
-        fig, ax = plt.subplots(figsize=(image.shape[1] / 100, image.shape[0] / 100))
-        # Display the visualization with SciView
-        ax.imshow(image)
+        # Set up the figure in a clean state
+        self._setup_figure()
         # Overlay markers on the visualization
-        for (x, y) in self.route.values():
-            ax.scatter(x, y, marker='o', color='red', s=50)  # Adjust marker properties
-
-        # Set axis limits and turn off axes
-        ax.set_xlim(0, image.shape[1])
-        ax.set_ylim(image.shape[0], 0)
-        ax.axis('off')  # Turn off axes
+        self._populate_route_dict()
+        # Get all the coordinates
+        all_points = [(x, y) for x, y in self.route.values()]
+        # Update the scatter plot with the new coordinates
+        self.scatter.set_offsets(all_points)
+        plt.title(f"{self.truck_name}, Package Locations")
         # Display the visualization with markers using SciView
         plt.show()
 
         # Clears the route for the next visualization
         self.route = {}
 
-    def visualize_truck_routes(self):
-        """
-        Visualizes the truck routes on an image.
+    def visualize_truck_route(self):
+        # Set up the figure in a clean state
+        self._setup_figure()
 
-        The function reads an image from the specified path and displays it using matplotlib. Then it extracts the
-        coordinates from the `self.route` dictionary and splits them into x and y coordinates for plotting. If the
-        route starts and ends at the same point, it is already closed. Otherwise, it explicitly closes the route. It
-        then plots the points and the route on the image using matplotlib. Finally, it sets the x and y limits of the
-        plot, turns off the axis, and displays the image.
-
-        Parameters:
-        - None
-
-        Returns:
-        - None
-        """
-        image = plt.imread(self.__IMAGE_PATH)
-        fig, ax = plt.subplots(figsize=(image.shape[1] / 100, image.shape[0] / 100))
-        ax.imshow(image)
+        self._populate_route_dict()
 
         x, y = self._get_coord_and_close_route()
 
-        ax.scatter(x, y, marker='o', color='red', s=50)
-        ax.plot(x, y, color='blue', linestyle='dashed', linewidth=2)
+        # Update the line plot
+        self.line.set_data(x, y)
 
-        ax.set_xlim(0, image.shape[1])
-        ax.set_ylim(image.shape[0], 0)
-        ax.axis('off')
+        plt.title(f'{self.truck_name} Truck Route')
+
+        # Re-render the figure
+        self.fig.canvas.draw_idle()
         plt.show()
+        # Clears the figure to make sure start fresh for the next visualization
+        plt.close(self.fig)
 
         # Clears the route for the next visualization
         self.route = {}
 
     def visualize_all_truck_routes(self, trucks_list):
-        image = plt.imread(self.__IMAGE_PATH)
-        fig, ax = plt.subplots(figsize=(image.shape[1] / 100, image.shape[0] / 100))
-        ax.imshow(image)
+        # Set up the figure in a clean state
+        self._setup_figure()
+        legend_labels = []
+        line_objects = []
 
-        colors = ['red', 'blue', 'green']
+        # Collect all routes data
+        all_routes = []
         for idx, truck in enumerate(trucks_list):
+            route = {}
+            for address in truck.route:
+                route[address] = self.__ALL_COORDINATES[address]
+            all_routes.append(route)
+
+        for idx, route in enumerate(all_routes):
             # Reset the route for each truck
-            self.route = {}
-            for route in truck.route:
-                self.add_route_coord(route)
+            self.route = route
 
             x, y = self._get_coord_and_close_route()
 
-            ax.scatter(x, y, marker='o', color=colors[idx], s=50, label=truck.get_truck_id)
-            ax.plot(x, y, color=colors[idx], linestyle='dashed', linewidth=2)
-        ax.legend(loc='upper right', shadow=True)
-        ax.axis('off')
+            # Update the line plot
+            line, = self.ax.plot(x, y, color=self.COLORS[idx], linestyle=self.LINE_STYLES[idx],
+                                 marker=self.MARKERS[idx], linewidth=2)
+            line_objects.append(line)
+            legend_labels.append(f"Truck {trucks_list[idx].truck_name}")
+
+        self.ax.legend(handles=line_objects, labels=legend_labels, loc='upper right', shadow=True)
+
+        # Draw the figure
+        plt.draw()
+
+        # Show the visualization
+        plt.title('All Truck Routes')
         plt.show()
+        # Clears the figure to make sure start fresh for the next visualization
+        plt.close(self.fig)
+        # Reset the route for the next visualization
+        self.route = {}
 
     @staticmethod
     def visualize_pie_chart(filtered_packages, truck_title, start_interval, end_interval):
@@ -181,7 +201,7 @@ class Visualize:
         labels = list(status_count.keys())
         sizes = list(status_count.values())
         colors = ['gold', 'red', 'green']
-        explode = (0.1, 0.1, 0.1)
+        explode = tuple(0.1 for _ in range(len(labels)))  # Dynamically create explode tuple based on length of labels
         plt.pie(sizes, explode=explode, labels=labels, colors=colors, autopct='%1.1f%%', shadow=True, startangle=90)
         plt.axis('equal')
         plt.title(f'{truck_title} Package Status Distribution, {start_interval} - {end_interval}')
