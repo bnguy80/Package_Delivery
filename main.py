@@ -2,7 +2,6 @@ from package_delivery.delivery import trucks
 from package_delivery.trackingutil.tracking_util import validate_time_format
 from package_delivery.delivery.trucks import high_priority, medium_priority, low_priority
 from package_delivery import datastructures as ds
-from package_delivery.visualization.visualize import Visualize
 
 trucks_list = [high_priority, medium_priority, low_priority]
 has_packages_loaded = False
@@ -77,7 +76,7 @@ def delivery_submenu():
             if 1 <= truck_choice <= 3:
                 selected_truck = None
                 for truck in trucks_list:
-                    if truck.get_truck_id() == truck_choice:
+                    if truck.truck_id() == truck_choice:
                         selected_truck = truck
                         break
                 if selected_truck:
@@ -114,47 +113,52 @@ def delivery_submenu():
 
 
 def visualize_submenu():
-    is_address_added = False
-    vis = Visualize()
     while True:
         sub_menu = input(
             "[0] Exit\n"
-            "[1] Add address\n"
-            "[2] Visualize individual package locations\n"
-            "[3] Visualize truck routes\n"
-            "[4] Visualize all truck routes\n"
+            "[1] Visualize individual package locations\n"
+            "[2] Visualize truck route\n"
+            "[3] Visualize all truck routes\n"
         )
         if sub_menu == "0":
             print("Returning to main menu")
             break
         elif sub_menu == "1":
             while True:
-                print("Truck1, optimized route:", high_priority.route)
-                print("Truck2, optimized route:", medium_priority.route)
-                print("Truck3, optimized route:", low_priority.route)
-                add_route_coordinates = input("Enter address to add: ")
-                vis.add_route_coord(add_route_coordinates)
-                continue_adding = input("Continue adding address? (Y/N): ")
-                if continue_adding.upper() == "N":
-                    break
-            is_address_added = True
+                print("Select Truck ID(1-3):")
+                truck_choice = int(input())
+                if 1 <= truck_choice <= 3:
+                    selected_truck = None
+                    for truck in trucks_list:
+                        if truck.truck_id == truck_choice:
+                            selected_truck = truck
+                    if selected_truck:
+                        print(f"Selected Truck {selected_truck.truck_id}")
+                        selected_truck.visualize.visualize_package_locations()
+                        continue_visualizing = input("Continue visualizing? (Y/N): ")
+                        if continue_visualizing.upper() == "Y":
+                            continue
+                        else:
+                            break
         elif sub_menu == "2":
-            if not is_address_added:
-                print("Add address first!")
-                continue
-            vis.visualize_package_locations()
+            while True:
+                print("Select Truck ID(1-3):")
+                truck_choice = int(input())
+                if 1 <= truck_choice <= 3:
+                    selected_truck = None
+                    for truck in trucks_list:
+                        if truck.truck_id == truck_choice:
+                            selected_truck = truck
+                    if selected_truck:
+                        print(f"Selected Truck {selected_truck.truck_id}")
+                        selected_truck.visualize.visualize_truck_route()
+                        continue_visualizing = input("Continue visualizing? (Y/N): ")
+                        if continue_visualizing.upper() == "Y":
+                            continue
+                        else:
+                            break
         elif sub_menu == "3":
-            print("Select Truck ID(1-3):")
-            truck_choice = int(input())
-            if 1 <= truck_choice <= 3:
-                vis.get_singe_truck_route(truck_choice)
-                vis.visualize_truck_routes()
-            else:
-                print("Invalid Truck ID")
-        elif sub_menu == "4":
-            vis.visualize_all_truck_routes(trucks_list)
-        else:
-            print("Invalid option, please try again")
+            high_priority.visualize.visualize_all_truck_routes(trucks_list)
 
 
 def ui():
@@ -165,7 +169,7 @@ def ui():
         "[2] See single package from package_ID \n"
         "[3] Load packages onto trucks \n"
         "[4] Start delivery \n"
-        "[5] Visualize delivery route \n"
+        "[5] Visualize delivery simulation \n"
     )
     if main_menu == "0":
         print("Exit")
