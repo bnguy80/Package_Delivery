@@ -8,7 +8,7 @@ import math
 
 
 # 8/22/23 no longer needed as load_packages_nearest_neighbor() is used instead of sort_packages_on_truck()
-# to load packages onto trucks which uses the nearest neighbor algorithm and sorts the packages on the truck
+# to load packages onto trucks which use the nearest neighbor algorithm and sorts the packages on the truck
 
 # Sort the packages on the truck using the nearest neighbor algorithm and update the truck's route with the sorted route
 def sort_packages_on_truck(trucks, graph):
@@ -29,7 +29,7 @@ def sort_packages_on_truck(trucks, graph):
     # Initialize the sorted route with the hub vertex
     sorted_route = [current_vertex]
 
-    # Get the packages on the truck
+    # Get the packages in the truck
     packages = trucks.get_packages()
 
     # While there are still packages on the truck
@@ -37,7 +37,7 @@ def sort_packages_on_truck(trucks, graph):
         # Initialize the minimum distance to infinity and the nearest package to None
         min_distance = math.inf
         nearest_package = None
-        # For each package on the truck find the nearest package to the current vertex by calculating the distance
+        # For each package on the truck, find the nearest package to the current vertex by calculating the distance
         # between the current vertex and the destination vertex of the package
         for package in packages:
             dest_vertex = package.address
@@ -56,7 +56,7 @@ def sort_packages_on_truck(trucks, graph):
             sorted_route.append(nearest_package.address)
             # Update the current vertex to the nearest package's address
             current_vertex = nearest_package.address
-            # Remove the nearest package from the packages variable
+            # Remove the nearest package from the package variable
             packages.remove(nearest_package)
 
     # After all deliveries, return to the hub

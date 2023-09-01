@@ -188,8 +188,7 @@ class Visualize:
         # Reset the route for the next visualization
         self.route = {}
 
-    @staticmethod
-    def visualize_pie_chart(filtered_packages, truck_title, start_interval, end_interval):
+    def visualize_pie_chart(self, filtered_packages):
         # Status count of packages
         status_count = {'IN_TRANSIT': 0, 'AT_HUB': 0, 'DELIVERED': 0}
         for package, status_info in filtered_packages:
@@ -204,5 +203,5 @@ class Visualize:
         explode = tuple(0.1 for _ in range(len(labels)))  # Dynamically create explode tuple based on length of labels
         plt.pie(sizes, explode=explode, labels=labels, colors=colors, autopct='%1.1f%%', shadow=True, startangle=90)
         plt.axis('equal')
-        plt.title(f'{truck_title} Package Status Distribution, {start_interval} - {end_interval}')
+        plt.title(f'{self.truck_name} Package Status Distribution')
         plt.show()

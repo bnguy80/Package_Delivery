@@ -17,6 +17,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="\package_delivery\delivery\utah_gas_prices.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
       </map>
     </option>
   </component>
