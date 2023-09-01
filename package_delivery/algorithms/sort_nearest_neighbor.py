@@ -8,7 +8,7 @@ import math
 
 
 # 8/22/23 no longer needed as load_packages_nearest_neighbor() is used instead of sort_packages_on_truck()
-# to load packages onto trucks which uses the nearest neighbor algorithm and sorts the packages on the truck
+# to load packages onto trucks which use the nearest neighbor algorithm and sorts the packages on the truck
 
 # Sort the packages on the truck using the nearest neighbor algorithm and update the truck's route with the sorted route
 def sort_packages_on_truck(trucks, graph):
@@ -29,7 +29,7 @@ def sort_packages_on_truck(trucks, graph):
     # Initialize the sorted route with the hub vertex
     sorted_route = [current_vertex]
 
-    # Get the packages on the truck
+    # Get the packages in the truck
     packages = trucks.get_packages()
 
     # While there are still packages on the truck
