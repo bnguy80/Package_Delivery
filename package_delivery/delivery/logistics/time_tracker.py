@@ -11,6 +11,7 @@ class TimeTracker:
         track_truck_current_time (dict): Dictionary to track current_time for each truck.
         packages_status (dict): Dictionary to track packages_status for each truck.
         track_miles_traveled (dict): Dictionary to track miles traveled for each truck.
+        __id (int): The ID of the truck
     """
 
     def __init__(self, truck_id):
@@ -32,11 +33,13 @@ class TimeTracker:
         # Initialize miles_traveled for each truck to 0
         self.track_miles_traveled[truck_id] = 0
 
+        self.__id = truck_id
+
         # Set the current time for each truck based on its truck ID
         if truck_id == 1:
             self.track_truck_current_time[truck_id] = 8.0  # Set truck 1 start time to string 8:00 AM
         elif truck_id == 2:
-            self.track_truck_current_time[truck_id] = 9.083333  # Set truck 2 start time 9:05 AM
+            self.track_truck_current_time[truck_id] = 9.0844  # Set truck 2 start time 9:05 AM
         elif truck_id == 3:
             self.track_truck_current_time[truck_id] = 0  # Set truck 3 start time to zero will be updated when start delivery after truck 1
 
@@ -46,6 +49,12 @@ class TimeTracker:
         Get the speed of the truck.
         """
         return self.__TRUCK_SPEED
+
+    def get_miles_traveled(self):
+        """
+        Get the miles traveled by the truck.
+        """
+        return self.track_miles_traveled[self.__id]
 
 
 
@@ -60,12 +69,11 @@ class TimeTracker:
         """
         return self.packages_status
 
-    def set_track_truck_current_time(self, truck_id, new_time):
+    def set_track_truck_current_time(self, new_time):
         """
         Sets the current time for a specified truck.
 
         Parameters:
-            truck_id (int): The ID of the truck.
             new_time (datetime): The new current time to set for the truck.
 
         Raises:
@@ -74,8 +82,8 @@ class TimeTracker:
         Returns:
             None
         """
-        if truck_id in self.track_truck_current_time and self.track_truck_current_time[truck_id] != new_time:
-            self.track_truck_current_time[truck_id] = new_time
+        if self.__id in self.track_truck_current_time and self.track_truck_current_time[self.__id] != new_time:
+            self.track_truck_current_time[self.__id] = new_time
         else:
             raise ValueError("Current time not updated")
 
@@ -173,14 +181,13 @@ class TimeTracker:
 
     # Initialize the package status to 'AT_HUB' after loading all on trucks
     # Associate all packages with their truck they are loaded onto
-    def initialize_multiple_package_status(self, packages, initial_status, truck_id, time_loaded):
+    def initialize_multiple_package_status(self, packages, initial_status,time_loaded):
         """
         Initializes the status of multiple packages.
 
         Parameters:
             packages (list): A list of packages to initialize the status for.
             initial_status (str): The initial status of the packages.
-            truck_id (int): The ID of the truck.
             time_loaded (float): The time when the truck was loaded.
 
         Returns:
@@ -193,7 +200,7 @@ class TimeTracker:
             if package not in self.packages_status:
                 self.packages_status[package] = {
                     'status': initial_status,
-                    'truck': truck_id,
+                    'truck': self.__id,
                     'time_loaded': time_loaded,  # Keep as float to increment time_delivered
                     'delivery_deadline': formatted_delivery_time,
                     'time_to_start_delivery': formatted_time_to_start_delivery,
@@ -201,59 +208,56 @@ class TimeTracker:
                 }
 
     # Update the time_to_start_delivery for a specific truck for all packages on that truck
-    def update_time_to_start_delivery(self, truck_id, new_time):
+    def update_time_to_start_delivery(self, new_time):
         """
         Updates the time to start delivery for all packages assigned to a given truck.
 
         Parameters:
-            truck_id (int): The ID of the truck.
             new_time (float): The new time to start delivery.
 
         Returns:
             None
         """
         for package_id, package_info in self.packages_status.items():
-            if package_info['truck'] == truck_id:
+            if package_info['truck'] == self.__id:
                 package_info['time_to_start_delivery'] = util.float_time_24hr_str(new_time)
 
     def get_single_package_status(self, package):
         return self.packages_status[package]
 
     # Add time during from one delivery to another to current_time for the current truck
-    def increment_current_truck_time(self, time, current_truck):
+    def _increment_current_truck_time(self, time):
         """
         Increment the current time of a specific truck.
 
         Parameters:
             time (float): The amount of time to increment the current time by.
-            current_truck (int): The identifier of the truck to update.
 
         Returns:
             None
         """
-        self.track_truck_current_time[current_truck] += time
+        self.track_truck_current_time[self.__id] += time
 
     # Get the current time for the current truck
-    def get_current_truck_time(self, current_truck):
+    def get_current_truck_time(self):
         """
         Retrieves the current time of the specified truck.
 
         Parameters:
-            current_truck (int): The ID of the truck for which to retrieve the current time.
+        - None
 
         Returns:
             datetime.datetime: The current time of the specified truck.
         """
-        return self.track_truck_current_time[current_truck]
+        return self.track_truck_current_time[self.__id]
 
     # Update miles_traveled during delivery for current_truck
-    def update_miles_traveled(self, distance, current_truck):
+    def update_miles_traveled(self, distance):
         """
         Update the miles traveled for a specific truck.
 
         Parameters:
             distance (float): The distance traveled by the truck.
-            current_truck (int): The identifier of the current truck.
 
         Returns:
             None
@@ -261,21 +265,21 @@ class TimeTracker:
         miles = 0
         miles += distance
         # Update miles traveled for the current truck
-        current_miles_traveled = self.track_miles_traveled[current_truck]
-        self.track_miles_traveled[current_truck] = current_miles_traveled + miles
+        current_miles_traveled = self.track_miles_traveled[self.__id]
+        self.track_miles_traveled[self.__id] = current_miles_traveled + miles
 
     # Print miles traveled by current truck
-    def print_current_truck_miles(self, current_truck):
+    def print_current_truck_miles(self):
         """
         Print the number of miles traveled by a specific truck.
 
         Parameters:
-            current_truck (int): The identifier of the truck.
+        - None
 
         Returns:
-            None
+        - None
         """
-        miles_traveled = self.track_miles_traveled[current_truck]
+        miles_traveled = self.track_miles_traveled[self.__id]
         print("MILES_TRAVELED: ", miles_traveled, " miles")
         print()
 
@@ -284,15 +288,15 @@ class TimeTracker:
         Calculates the total miles traveled by summing the values in the track_miles_traveled dictionary.
 
         Parameters:
-            self (TimeTracker): The instance of the class.
+        - self (TimeTracker): The instance of the class.
 
         Returns:
-            float: The total miles traveled.
+        - float: The total miles traveled.
         """
         return sum(self.track_miles_traveled.values())
 
     # Calculate the time in minutes: time = distance / speed
-    def calculate_travel_time_minutes(self, distance):
+    def _calculate_travel_time_minutes(self, distance):
         """
         Calculate the travel time in minutes based on the distance and the truck's speed.
 
@@ -306,25 +310,24 @@ class TimeTracker:
         return distance / speed
 
     # Update current_truck delivery time and insert into delivery_time of package
-    def update_current_truck_time(self, distance, current_truck_id):
+    def update_current_truck_time(self, distance):
         """
         Updates the current time of a given truck based on the distance traveled.
 
         Parameters:
-            distance (float): The distance traveled by the truck.
-            current_truck_id (int): The ID of the current truck.
+        - distance (float): The distance traveled by the truck.
 
         Returns:
-            str: The formatted current time of the truck.
+        - str: The formatted current time of the truck.
         """
         # Calculate travel time for each segment of the route for the current truck
         # Add to current_time
-        transit_time = self.calculate_travel_time_minutes(distance)
+        transit_time = self._calculate_travel_time_minutes(distance)
         transit_time_hours = transit_time / 60  # Convert transit_time from minutes to hours
 
-        self.increment_current_truck_time(transit_time_hours, current_truck_id)
+        self._increment_current_truck_time(transit_time_hours)
         # Float to string for current_time
-        formatted_truck_current_time = util.float_time_24hr_str(self.track_truck_current_time[current_truck_id])
+        formatted_truck_current_time = util.float_time_24hr_str(self.track_truck_current_time[self.__id])
         return formatted_truck_current_time
 
     def insert_current_truck_time_to_package(self, package, time_delivered):
@@ -366,22 +369,27 @@ class TimeTracker:
         Returns:
             bool: True if the delivery for all packages is completed, False otherwise.
         """
-        max_time_delivered = None
-        for status in self.packages_status.values():
-            time_delivered = status['time_delivered']
-            if time_delivered:
-                if max_time_delivered is None or time_delivered > max_time_delivered:
-                    max_time_delivered = time_delivered
-        return max_time_delivered is not None
+        latest_delivery_time = None
+        for package_status in self.packages_status.values():
+            time_delivered = package_status['time_delivered']
+            if time_delivered and (latest_delivery_time is None or time_delivered > latest_delivery_time):
+                latest_delivery_time = time_delivered
+        return latest_delivery_time is not None
 
     # Dynamically update the status of packages to 'AT_HUB','IN_TRANSIT','DELIVERED' as the truck travels
     # Should not hard-code the package status to 'AT_HUB','IN_TRANSIT' and 'DELIVERED' to avoid errors
     def filter_packages_by_time_range(self, start_interval, end_interval):
         """
         Filter packages by time range.
+
+        Parameters:
+            start_interval (str): The start time interval for package delivery.
+            end_interval (str): The end time interval for package delivery.
+
+        Returns:
+            filtered_packages (list): A list of filtered packages
         """
         filtered_packages = []
-
         start_time = util.convert_12h_to_24h_datetime(start_interval)
         end_time = util.convert_12h_to_24h_datetime(end_interval)
 
@@ -407,5 +415,4 @@ class TimeTracker:
             except ValueError as e:
                 print(f"Error parsing time for package {package}: {e}, time_delivered: {0}")
 
-        print("FILTERED_PACKAGE COUNT:", len(filtered_packages))
         return filtered_packages
