@@ -37,7 +37,7 @@ def sort_packages_on_truck(trucks, graph):
         # Initialize the minimum distance to infinity and the nearest package to None
         min_distance = math.inf
         nearest_package = None
-        # For each package on the truck find the nearest package to the current vertex by calculating the distance
+        # For each package on the truck, find the nearest package to the current vertex by calculating the distance
         # between the current vertex and the destination vertex of the package
         for package in packages:
             dest_vertex = package.address
@@ -56,7 +56,7 @@ def sort_packages_on_truck(trucks, graph):
             sorted_route.append(nearest_package.address)
             # Update the current vertex to the nearest package's address
             current_vertex = nearest_package.address
-            # Remove the nearest package from the packages variable
+            # Remove the nearest package from the package variable
             packages.remove(nearest_package)
 
     # After all deliveries, return to the hub
