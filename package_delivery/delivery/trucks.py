@@ -59,10 +59,12 @@ class Trucks:
         # Composite class relationship, Trucks object 'has a' TimeTracker object relationship to track the status of
         # packages
         self.time_tracker = TimeTracker(self.__truck_id)
-        # Composite class relationship, Trucks object 'has a' Visualize object relationship to visualize delivery
-        self.visualize = Visualize(self.route, self.__truck_id, self.__truck_name)
-        # Composite class relationship, Trucks object 'has a' FuelTracker object relationship to track fuel
-        self.fuel_tracker = FuelTracker(self.__truck_id, self.__truck_name, self.time_tracker)
+        # Composite class relationship, Trucks object 'has a' Visualize object relationship to visualize a delivery
+        # Modified singleton design pattern to manage the visual state of each truck
+        self.visualize = Visualize(self.__truck_id)
+        # Composite class relationship, Trucks object 'has a' FuelTracker object relationship to track a fuel
+        # Singleton design pattern to manage the data state of each truck
+        self.fuel_tracker = FuelTracker(self.__truck_id)
 
     @property
     def truck_id(self):
@@ -192,7 +194,7 @@ class Trucks:
         Returns:
             int: The number of packages in the current instance.
         """
-        return len(self.get_packages())
+        return len(self.packages)
 
 
 # Forty packages, 9 + 16 + 15 respectively? for trucks, maximum number of packages to load
@@ -225,6 +227,8 @@ def load_trucks(truck_high_priority, truck_medium_priority, truck_low_priority, 
     util.load_left_over_packages(high_priority, left_over1, util.track_package_id1)
     util.load_left_over_packages(medium_priority, left_over1, util.track_package_id1)
     util.load_left_over_packages(low_priority, left_over1, util.track_package_id1)
+    for truck in trucks:
+        truck.visualize.populate_address(truck.truck_id, truck.route)
 
 
 # Calculate the shortest route to deliver packages to destination
@@ -309,7 +313,7 @@ def deliver_packages(trucks, graph, start_interval, end_interval):
                 # Update miles traveled for the current truck
                 time_tracker.update_miles_traveled(total_distance)
                 # Update fuel level for the current truck
-                current_truck.fuel_tracker.update_fuel_level()
+                current_truck.fuel_tracker.update_fuel_level(current_truck.truck_id, current_truck.time_tracker)
 
             # Check if the start time is 9:35 AM and update at 10:20 AM
             # If so, update the package with ID 9 to the new address
@@ -375,7 +379,7 @@ def deliver_truck3_packages(truck3, graph, start_interval, end_interval):
     # Update miles traveled for the current truck
     time_tracker.update_miles_traveled(total_distance)
     # Update fuel level for the current truck
-    truck3.fuel_tracker.update_fuel_level()
+    truck3.fuel_tracker.update_fuel_level(truck3.truck_id, truck3.time_tracker)
 
     filtered_packages = truck3.time_tracker.filter_packages_by_time_range(start_interval, end_interval)
     truck3.insert_filtered_packages(filtered_packages)
@@ -406,24 +410,10 @@ low_priority.time_tracker.initialize_multiple_package_status(low_priority.get_pa
 
 trucks_list = [high_priority, medium_priority, low_priority]
 deliver_packages(trucks_list, ds.graph_access, '12:03 PM', '1:12 PM')
-# high_priority.fuel_tracker.print_fuel_level()
-# high_priority.fuel_tracker.print_fuel_used()
-# medium_priority.fuel_tracker.print_fuel_level()
-# medium_priority.fuel_tracker.print_fuel_used()
-# low_priority.fuel_tracker.print_fuel_level()
-# low_priority.fuel_tracker.print_fuel_used()
 # high_priority.visualize.visualize_all_truck_routes(trucks_list)
-# high_priority.visualize.visualize_truck_route()
-# high_priority.visualize.visualize_pie_chart(high_priority.filtered_packages)
-# medium_priority.visualize.visualize_truck_route()
-# low_priority.visualize.visualize_truck_route()
-high_priority.fuel_tracker.print_travel_cost()
-medium_priority.fuel_tracker.print_travel_cost()
-low_priority.fuel_tracker.print_travel_cost()
-#
-# # Working on to calculate total miles traveled of all trucks
-# total_miles_traveled = 0
-# for truck in trucks_list:
-#     total_miles_traveled += truck.time_tracker.calculate_total_miles_traveled()
-# print("Total miles traveled:", total_miles_traveled)
-# high_priority.time_tracker.lookup_single_package_status(15, '7:00 AM')
+high_priority.visualize.visualize_truck_route(high_priority.truck_id, high_priority.truck_name)
+high_priority.visualize.visualize_pie_chart(high_priority.filtered_packages, high_priority.truck_name)
+medium_priority.visualize.visualize_truck_route(medium_priority.truck_id, medium_priority.truck_name)
+low_priority.visualize.visualize_truck_route(low_priority.truck_id, low_priority.truck_name)
+high_priority.visualize.visualize_all_truck_routes(trucks_list, high_priority.truck_id)
+
