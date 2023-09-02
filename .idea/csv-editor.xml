@@ -17,7 +17,7 @@
             </Attribute>
           </value>
         </entry>
-        <entry key="\package_delivery\delivery\utah_gas_prices.csv">
+        <entry key="\package_delivery\delivery\logistics\utah_gas_prices.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />

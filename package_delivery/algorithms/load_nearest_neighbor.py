@@ -66,4 +66,4 @@ def load_packages_nearest_neighbor(trucks, graph, track_package_id):
 
         # Return to the hub
         truck.route.append('4001 South 700 East')
-        truck.visualize.update_address(truck.route)
+        truck.visualize.update_address(truck.route, truck.truck_id)

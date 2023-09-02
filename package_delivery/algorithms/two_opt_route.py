@@ -97,7 +97,7 @@ def two_opt_route(trucks, graph):
         current_route = best_route
     # Update the truck's route with the optimized route
     trucks.route = best_route
-    trucks.visualize.update_address(trucks.route)
+    trucks.visualize.update_address(trucks.route, trucks.truck_id)
     # Optimize the order of packages to reflect the optimized route
     optimized_packages = []
     for address in current_route:
