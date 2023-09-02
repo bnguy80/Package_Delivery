@@ -4,7 +4,7 @@ from package_delivery.trackingutil import tracking_util as util
 
 class TimeTracker:
     """
-    Class to track the time for each truck. Componite of Trucks class
+    Class to track the time for each truck. Composite of Trucks class
 
     Attributes:
         __TRUCK_SPEED (float): The speed of the truck.
@@ -74,7 +74,7 @@ class TimeTracker:
         Sets the current time for a specified truck.
 
         Parameters:
-            new_time (datetime): The new current time to set for the truck.
+            new_time (float): The new current time to set for the truck.
 
         Raises:
             ValueError: If the current time is not updated.
