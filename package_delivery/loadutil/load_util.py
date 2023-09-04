@@ -28,7 +28,7 @@ def get_all_packages_to_load(graph, track_package_id):
 
 
 # Check if the truck can load the packages based on constraints
-def can_load_packages(truck, package):
+def has_load_packages(truck, package):
     """
     Determines whether a given package can be loaded onto a truck based on various constraints.
 
@@ -69,7 +69,7 @@ def can_load_packages(truck, package):
 
 
 # Check if the package has any constraints in its special notes
-def package_has_constraints(package):
+def has_package_constraints(package):
     """
     Check if a package has any constraints.
 
