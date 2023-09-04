@@ -1,4 +1,5 @@
 import csv
+from pathlib import Path
 from package_delivery.datastructures.hash_map import package_hashmap
 
 
@@ -136,8 +137,12 @@ class Graph:
         Returns:
             list: A list of lists representing the vertex distances.
         """
+        # Get the current directory where this file is
+        current_directory = Path(__file__).parent
+        # Construct the full path to the CSV file
+        csv_path = current_directory / file_name
         csv_distances = []  # To get all data from WGUPS_distances.csv
-        with open(file_name) as csv_file:
+        with csv_path.open('r') as csv_file:
             csv_reader = csv.reader(csv_file)
             next(csv_reader, None)  # Skip header
             for row in csv_reader:
@@ -245,9 +250,10 @@ class Graph:
                     print()
 
 
+# Create a graph and load it with data from WGUPS_distances.csv of edges between packages and their distances
 graph_access = Graph()
-graph_access.load_graph(r'C:\Users\brand\IdeaProjects\Package_Delivery_Program_New\package_delivery\datastructures'
-                        r'\WGUPS_distances.csv')
+graph_access.load_graph('WGUPS_distances.csv')
+# Associate packages with their vertices in the graph to allow for easy access to packages
 graph_access.insert_packages_vertex_associate(package_hashmap)
 
 # 7/25/23: All 40 packages associated correctly with their vertex(address)
