@@ -1,3 +1,5 @@
+# Student ID: 003964281
+
 from package_delivery.delivery import trucks
 from package_delivery.trackingutil.tracking_util import validate_time_format
 from package_delivery.delivery.trucks import high_priority, medium_priority, low_priority
@@ -43,7 +45,7 @@ def delivery_submenu():
             "[0] Exit\n"
             "[1] Start delivery and see status?\n"
             "[2] See single package status during delivery?\n"
-            "[3] See final status of all packages after delivery?\n"
+            "[3] See final status of all packages after delivery and total miles traveled?\n"
         )
         if sub_menu == "0":
             print("Returning to main menu")
@@ -76,7 +78,7 @@ def delivery_submenu():
             if 1 <= truck_choice <= 3:
                 selected_truck = None
                 for truck in trucks_list:
-                    if truck.truck_id() == truck_choice:
+                    if truck.truck_id == truck_choice:
                         selected_truck = truck
                         break
                 if selected_truck:
@@ -134,7 +136,8 @@ def visualize_submenu():
                             selected_truck = truck
                     if selected_truck:
                         print(f"Selected Truck {selected_truck.truck_id}")
-                        selected_truck.visualize.visualize_package_locations()
+                        selected_truck.visualize.visualize_package_locations(selected_truck.truck_id,
+                                                                             selected_truck.truck_name)
                         continue_visualizing = input("Continue visualizing? (Y/N): ")
                         if continue_visualizing.upper() == "Y":
                             continue
@@ -151,14 +154,15 @@ def visualize_submenu():
                             selected_truck = truck
                     if selected_truck:
                         print(f"Selected Truck {selected_truck.truck_id}")
-                        selected_truck.visualize.visualize_truck_route()
+                        selected_truck.visualize.visualize_truck_route(selected_truck.truck_id,
+                                                                       selected_truck.truck_name)
                         continue_visualizing = input("Continue visualizing? (Y/N): ")
                         if continue_visualizing.upper() == "Y":
                             continue
                         else:
                             break
         elif sub_menu == "3":
-            high_priority.visualize.visualize_all_truck_routes(trucks_list)
+            high_priority.visualize.visualize_all_truck_routes(trucks_list, high_priority.truck_id)
 
 
 def ui():
