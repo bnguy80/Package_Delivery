@@ -41,7 +41,8 @@ class TimeTracker:
         elif truck_id == 2:
             self.track_truck_current_time[truck_id] = 9.0844  # Set truck 2 start time 9:05 AM
         elif truck_id == 3:
-            self.track_truck_current_time[truck_id] = 0  # Set truck 3 start time to zero will be updated when start delivery after truck 1
+            self.track_truck_current_time[truck_id] = 0  # Set truck 3 start time to zero will be updated when start
+            # delivery after truck 1
 
     # Fixed speed of truck to calculate travel time
     def _get_truck_speed(self):
@@ -56,11 +57,9 @@ class TimeTracker:
         """
         return self.track_miles_traveled[self.__id]
 
-
-
     # Get the status of all packages
     @property
-    def package_status(self):
+    def get_package_status(self):
         """
         Get all package statuses.
 
@@ -121,7 +120,8 @@ class TimeTracker:
 
     # Update package in package_status dictionary
 
-    def update_package_status(self, package, new_address, new_city, new_state, new_zipcode, new_special_notes, current_time):
+    def update_package_status(self, package, new_address, new_city, new_state, new_zipcode, new_special_notes,
+                              current_time):
         """
         Updates the status of a package in the package status dictionary.
 
@@ -181,7 +181,7 @@ class TimeTracker:
 
     # Initialize the package status to 'AT_HUB' after loading all on trucks
     # Associate all packages with their truck they are loaded onto
-    def initialize_multiple_package_status(self, packages, initial_status,time_loaded):
+    def initialize_multiple_package_status(self, packages, initial_status, time_loaded):
         """
         Initializes the status of multiple packages.
 
@@ -288,7 +288,7 @@ class TimeTracker:
         Calculates the total miles traveled by summing the values in the track_miles_traveled dictionary.
 
         Parameters:
-        - self (TimeTracker): The instance of the class.
+        - None
 
         Returns:
         - float: The total miles traveled.
@@ -378,7 +378,7 @@ class TimeTracker:
 
     # Dynamically update the status of packages to 'AT_HUB','IN_TRANSIT','DELIVERED' as the truck travels
     # Should not hard-code the package status to 'AT_HUB','IN_TRANSIT' and 'DELIVERED' to avoid errors
-    def filter_packages_by_time_range(self, start_interval, end_interval):
+    def get_filtered_packages_by_time_range(self, start_interval, end_interval):
         """
         Filter packages by time range.
 

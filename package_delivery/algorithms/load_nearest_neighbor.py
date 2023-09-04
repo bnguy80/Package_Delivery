@@ -27,7 +27,7 @@ def load_packages_nearest_neighbor(trucks, graph, track_package_id):
         unconstrained_packages = []
 
         for package in remaining_packages:
-            if util.can_load_packages(truck, package):
+            if util.has_load_packages(truck, package):
                 constrained_packages.append(package)
             else:
                 # Add unconstrained packages to the unconstrained_packages list
@@ -35,7 +35,7 @@ def load_packages_nearest_neighbor(trucks, graph, track_package_id):
                 unconstrained_packages.append(package)
 
         # Remove unconstrained packages with constraints of the current truck from the unconstrained_packages list
-        unconstrained_packages = [package for package in unconstrained_packages if not util.package_has_constraints(package)]
+        unconstrained_packages = [package for package in unconstrained_packages if not util.has_package_constraints(package)]
 
         # Combine the constrained_packages and unconstrained_packages lists to form a list of all packages
         # for the current truck

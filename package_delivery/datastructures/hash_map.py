@@ -1,4 +1,5 @@
 import csv
+from pathlib import Path
 
 
 # Individual packages with their delivery relevant information to be represented as HashMap entries
@@ -293,8 +294,12 @@ class HashMap:
             None: If an error occurs while loading the hash map.
             self: The instance of the class after the CSV file is successfully loaded into the hash map.
         """
+        # Get the current directory where this file is
+        current_directory = Path(__file__).parent
+        # Construct the full path to the CSV file
+        csv_path = current_directory / file_name
         try:
-            with open(file_name) as csv_file:
+            with csv_path.open('r') as csv_file:
                 csv_reader = csv.reader(csv_file)
 
                 for package in csv_reader:
@@ -323,10 +328,10 @@ class HashMap:
 
         return self
 
-    # Get a full list of values printed, testing purposes for a function editing list
-    def get_hash_map_all(self):
+    # Print a full list of values printed, testing purposes for a function editing list
+    def print_hash_map_all(self):
         """
-        Get all values from the hash map.
+        Prints all values from the hash map.
 
         This function iterates over the keys from 1 to 40 and prints the corresponding value
         from the `package_hashmap` using the `get_value_from_key` method.
@@ -352,7 +357,6 @@ class HashMap:
         return True
 
 
-# Initialize HashMap object and load data
+# Create a hash map and load it with data from WGUPS Package File Formatted.csv of all packages
 package_hashmap = HashMap()
-package_hashmap.load_hash_map(r'C:\Users\brand\IdeaProjects\Package_Delivery_Program_New\package_delivery'
-                              r'\datastructures\WGUPS Package File Formatted.csv')
+package_hashmap.load_hash_map('WGUPS Package File Formatted.csv')

@@ -32,18 +32,18 @@ class Trucks:
 
     Attributes:
         packages (list): A list of packages.
-        filtered_packages (list): A list of packages that have been filtered.
-        route (list): A list of vertices representing the route.
-        distances (list): A list of distances.
-        pred_vertex (list): A list of predecessor vertices.
-        time_tracker (TimeTracker): A TimeTracker object to track status of packages
-        visualize (Visualize): A Visualize object to visualize delivery
-        fuel_tracker (FuelTracker): A FuelTracker object to track fuel
+        filtered_packages (list): A list of packages that have been filtered by time.
+        route (list): A list of vertices representing the route from finding the shortest path.
+        distances (list): A list of distances calculated from finding the shortest path.
+        pred_vertex (list): A list of predecessor vertices from finding the shortest path.
+        time_tracker (TimeTracker): A TimeTracker object to track status of packages.
+        visualize (Visualize): A Visualize object to visualize delivery.
+        fuel_tracker (FuelTracker): A FuelTracker object to track fuel consumption during delivery.
         __truck_id (int): The ID of the truck.
         __truck_name (str): The name of the truck.
     """
 
-    # List of packages, route, distances, predecessor vertices to be loaded onto a Trucks object
+    # All the necessary attributes to represent a truck
     def __init__(self, truck_id, truck_name):
         """
         Initialize the truck object
@@ -166,7 +166,7 @@ class Trucks:
 
     def print_filtered_packages(self):
         """
-        Print the filtered packages in the `self.filtered_packages` list.
+        Print the filtered packages in the `self.filtered_packages` list during delivery.
         """
         for package in self.filtered_packages:
             print(package)
@@ -189,7 +189,7 @@ class Trucks:
     # Return the count of list packages for Trucks object
     def get_package_count(self):
         """
-        Calculates the number of packages in the current instance of the class.
+        Get the number of packages in the truck.
 
         Returns:
             int: The number of packages in the current instance.
@@ -235,7 +235,7 @@ def load_trucks(truck_high_priority, truck_medium_priority, truck_low_priority, 
 # and back to hub after applying Dijkstra's algorithm
 def _find_shortest_route_to_deliver(truck, graph):
     """
-    Find the shortest route for a truck to deliver packages.
+Find the shortest route for a truck to deliver packages.
 
     Parameters:
         truck (Truck): The truck object representing the delivery truck.
@@ -264,7 +264,7 @@ def _find_shortest_route_to_deliver(truck, graph):
         # Insert the time_delivered into package
         truck.time_tracker.insert_current_truck_time_to_package(package, time_delivered)
         # Update the time for other packages with the same address
-        for other_package, status_info in truck.time_tracker.package_status.items():
+        for other_package, status_info in truck.time_tracker.get_package_status.items():
             if (other_package != package and other_package.address == package.address and status_info['status'] !=
                     'DELIVERED'):
                 truck.time_tracker.insert_current_truck_time_to_package(other_package, time_delivered)
@@ -294,6 +294,10 @@ def deliver_packages(trucks, graph, start_interval, end_interval):
     # Flag to track if truck 1's delivery is completed
     is_delivery_completed = False
     for current_truck in trucks:
+        # Reset filtered packages for the current truck for each run of the function
+        current_truck.filtered_packages = []
+        # Reset miles traveled for the current truck for each run of the function
+        current_truck.time_tracker.track_miles_traveled[current_truck.truck_id] = 0
         # Current truck time tracker high_priority, medium_priority, low_priority
         time_tracker = current_truck.time_tracker
         # Get the name of the current truck
@@ -335,8 +339,8 @@ def deliver_packages(trucks, graph, start_interval, end_interval):
                     deliver_truck3_packages(current_truck, graph, start_interval, end_interval)
             # Only filter packages if the current truck is truck1 or truck2
             if current_truck == high_priority or current_truck == medium_priority:
-                filtered_packages = current_truck.time_tracker.filter_packages_by_time_range(start_interval,
-                                                                                             end_interval)
+                filtered_packages = current_truck.time_tracker.get_filtered_packages_by_time_range(start_interval,
+                                                                                                   end_interval)
                 current_truck.insert_filtered_packages(filtered_packages)
                 print("Start time:", start_interval, "End time:", end_interval)
                 print("FILTERED_PACKAGE COUNT:", len(current_truck.filtered_packages))
@@ -381,7 +385,7 @@ def deliver_truck3_packages(truck3, graph, start_interval, end_interval):
     # Update fuel level for the current truck
     truck3.fuel_tracker.update_fuel_level(truck3.truck_id, truck3.time_tracker)
 
-    filtered_packages = truck3.time_tracker.filter_packages_by_time_range(start_interval, end_interval)
+    filtered_packages = truck3.time_tracker.get_filtered_packages_by_time_range(start_interval, end_interval)
     truck3.insert_filtered_packages(filtered_packages)
     print("Start time:", start_interval, "End time:", end_interval)
     print("FILTERED_PACKAGE COUNT:", len(truck3.filtered_packages))
@@ -407,13 +411,3 @@ medium_priority.time_tracker.initialize_multiple_package_status(medium_priority.
 # Placeholder for packages that will be delivered by truck 3, Truck 3 will have new time_to_start_delivery
 # and current_time attributes to reflect the time it will start delivering packages
 low_priority.time_tracker.initialize_multiple_package_status(low_priority.get_packages(), 'AT_HUB', 8.0)
-
-trucks_list = [high_priority, medium_priority, low_priority]
-deliver_packages(trucks_list, ds.graph_access, '12:03 PM', '1:12 PM')
-# high_priority.visualize.visualize_all_truck_routes(trucks_list)
-high_priority.visualize.visualize_truck_route(high_priority.truck_id, high_priority.truck_name)
-high_priority.visualize.visualize_pie_chart(high_priority.filtered_packages, high_priority.truck_name)
-medium_priority.visualize.visualize_truck_route(medium_priority.truck_id, medium_priority.truck_name)
-low_priority.visualize.visualize_truck_route(low_priority.truck_id, low_priority.truck_name)
-high_priority.visualize.visualize_all_truck_routes(trucks_list, high_priority.truck_id)
-
