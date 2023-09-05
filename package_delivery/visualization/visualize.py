@@ -67,6 +67,15 @@ class Visualize:
             self.address[truck_id] = {}
 
     def _setup_figure(self, truck_id):
+        """
+        Set up the figure for plotting the truck's data.
+
+        Parameters:
+            truck_id (int): The ID of the truck.
+
+        Returns:
+            None
+        """
         idx = (truck_id - 1) % 3
         # Read the image
         image = plt.imread(self.__IMAGE_PATH)
@@ -132,6 +141,16 @@ class Visualize:
 
     # Visualize package locations
     def visualize_package_locations(self, truck_id, truck_name):
+        """
+        Visualize package locations for a given truck.
+
+        Parameters:
+            truck_id (int): The ID of the truck.
+            truck_name (str): The name of the truck.
+
+        Returns:
+            None
+        """
         # Set up the figure in a clean state
         self._setup_figure(truck_id)
         # Overlay markers on the visualization
@@ -148,6 +167,16 @@ class Visualize:
         self.route = {}
 
     def visualize_truck_route(self, truck_id, truck_name):
+        """
+        Visualizes the route of a truck on a figure.
+
+        Parameters:
+            truck_id (int): The ID of the truck.
+            truck_name (str): The name of the truck.
+
+        Returns:
+            None
+        """
         # Set up the figure in a clean state
         self._setup_figure(truck_id)
 
@@ -170,6 +199,16 @@ class Visualize:
         self.route[truck_id] = {}
 
     def visualize_all_truck_routes(self, trucks_list, truck_id):
+        """
+        Visualizes all truck routes on a single plot.
+
+        Parameters:
+            trucks_list (list): A list of Truck objects representing the trucks whose routes will be visualized.
+            truck_id (int): The ID of the truck to be able to set up the visualization.
+
+        Returns:
+            None
+        """
         # Set up the figure in a clean state
         self._setup_figure(truck_id)
         legend_labels = []
@@ -209,6 +248,16 @@ class Visualize:
         self.route[truck_id] = {}
 
     def visualize_pie_chart(self, filtered_packages, truck_name):
+        """
+        Visualizes a pie chart of the package status distribution for a given truck.
+
+        Parameters:
+            filtered_packages (list): A list of tuples containing package information and status.
+            truck_name (str): The name of the truck.
+
+        Returns:
+            None
+        """
         # Status count of packages
         status_count = {'IN_TRANSIT': 0, 'AT_HUB': 0, 'DELIVERED': 0}
         for package, status_info in filtered_packages:
