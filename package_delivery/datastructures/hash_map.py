@@ -234,7 +234,7 @@ class HashMap:
             print("=" * 40)
 
     # To update value in a key-value pair if changed
-    def update_value(self, key, value):
+    def update_key_value_pair(self, key, value):
         """
         Updates the value of a key in the map.
 
@@ -258,7 +258,7 @@ class HashMap:
             print(f"Error updating package with key: {key}")
 
     # Find a key-value pair to delete
-    def delete_key_value(self, key):
+    def delete_key_value_pair(self, key):
         """
         Deletes a key-value pair from the map based on the given key.
 
