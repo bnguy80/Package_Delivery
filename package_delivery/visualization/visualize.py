@@ -198,6 +198,25 @@ class Visualize:
         # Clears the route for the next visualization
         self.route[truck_id] = {}
 
+    def dynamic_truck_route(self, truck_id, truck_name):
+
+        self._setup_figure(truck_id)
+
+        self._populate_route_dict(truck_id)
+
+        x, y = self._get_coord_and_close_route(truck_id)
+
+        plt.title(f'{truck_name} Truck Route')
+
+        # Re-render the figure
+        self.fig.canvas.draw_idle()
+        plt.show()
+        # Clears the figure to make sure start fresh for the next visualization
+        plt.close(self.fig)
+
+        # Clears the route for the next visualization
+        self.route[truck_id] = {}
+
     def visualize_all_truck_routes(self, trucks_list, truck_id):
         """
         Visualizes all truck routes on a single plot.
