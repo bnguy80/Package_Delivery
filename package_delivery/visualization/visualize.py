@@ -1,4 +1,6 @@
 import matplotlib.pyplot as plt
+import csv
+from pathlib import Path
 
 
 class Visualize:
@@ -17,10 +19,9 @@ class Visualize:
         """
         Initialize the Visualize object
         """
+        current_directory = Path(__file__).parent
         if not Visualize._initialized:
-            self.__IMAGE_PATH = (
-                'C:/Users/brand/IdeaProjects/Package_Delivery_Program_New/package_delivery/visualization'
-                '/Picture1.jpg')
+            self.__IMAGE_PATH = current_directory / "Picture1.jpg"
             # Create a figure and axes
             self.fig, self.ax = None, None
             # Create a scatter plot
@@ -30,35 +31,7 @@ class Visualize:
             self.route = {}
             self.address = {}
             # All coordinates (x, y) dictionary; visualize a Picture1.jpg dimensions 672x756
-            self.__ALL_COORDINATES = {
-                '4001 South 700 East': (397, 457),
-                '195 W Oakland Ave': (309, 316),
-                '2530 S 500 E': (372, 320),
-                '233 Canyon Rd': (344, 57),
-                '380 W 2880 S': (290, 351),
-                '410 S State St': (336, 122),
-                '3060 Lester St': (171, 369),
-                '300 State St': (335, 111),
-                '600 E 900 South': (413, 139),
-                '2600 Taylorsville Blvd': (110, 593),
-                '3575 W Valley Central Station bus Loop': (67, 478),
-                '2010 W 500 S': (131, 129),
-                '4580 S 2300 E': (550, 517),
-                '3148 S 1100 W': (216, 376),
-                '1488 4800 S': (184, 547),
-                '177 W Price Ave': (310, 424),
-                '3595 Main St': (330, 420),
-                '6351 South 900 East': (422, 678),
-                '5100 South 2700 West': (102, 572),
-                '5025 State St': (339, 557),
-                '5383 South 900 East #104': (413, 594),
-                '1060 Dalton Ave S': (213, 186),
-                '2835 Main St': (327, 345),
-                '1330 2100 S': (469, 288),
-                '3365 S 900 W': (239, 397),
-                '2300 Parkway Blvd': (130, 325),
-                '4300 S 1300 E': (447, 490)
-            }
+            self.__ALL_COORDINATES = self._load_coordinates_from_csv()
             Visualize._initialized = True
 
         if truck_id not in self.route:
@@ -89,6 +62,25 @@ class Visualize:
         self.scatter = self.ax.scatter([], [], marker=self.MARKERS[idx], color=self.COLORS[idx], s=50)
         # Set the line plot
         self.line, = self.ax.plot([], [], color=self.COLORS[idx], linestyle=self.LINE_STYLES[idx], linewidth=2)
+
+    @classmethod
+    def _load_coordinates_from_csv(cls):
+        """
+        Load the coordinates from a CSV file.
+        """
+        # Read the CSV file
+        coordinates = {}
+        current_directory = Path(__file__).parent
+        csv_path = current_directory / 'address_coordinates.csv'
+        with csv_path.open('r') as csv_file:
+            csv_reader = csv.reader(csv_file)
+            next(csv_reader, None)  # Skip header
+            for row in csv_reader:
+                address = row[0]
+                x = int(row[1])
+                y = int(row[2])
+                coordinates[address] = (x, y)
+        return coordinates
 
     # Get all coordinates from the addresses
     def _populate_route_dict(self, truck_id):

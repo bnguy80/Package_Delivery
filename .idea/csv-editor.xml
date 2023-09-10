@@ -24,6 +24,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="\package_delivery\visualization\address_coordinates.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
       </map>
     </option>
   </component>
