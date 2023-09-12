@@ -1,7 +1,7 @@
 # Student ID: 003964281
 
 from package_delivery.delivery import trucks
-from package_delivery.trackingutil.tracking_util import validate_time_format
+from package_delivery.timeutil.time_util import validate_time_format
 from package_delivery.delivery.trucks import high_priority, medium_priority, low_priority
 from package_delivery import datastructures as ds
 
@@ -43,7 +43,7 @@ def delivery_submenu():
     while True:
         sub_menu = input(
             "[0] Exit\n"
-            "[1] Start delivery and see status?\n"
+            "[1] Start delivery and see status of all trucks?\n"
             "[2] See single package status during delivery?\n"
             "[3] See final status of all packages after delivery and total miles traveled?\n"
         )
@@ -52,16 +52,21 @@ def delivery_submenu():
             break
         if sub_menu == "1":
             has_started_delivery = True
-            start_interval = input("Enter start interval (e.g., '8:25 AM', '9:35 AM', '12:03 AM'): ")
+            start_interval = input("Enter start interval (e.g., '8:35 AM', '9:35 AM', '12:03 PM'): ")
             end_interval = input("Enter end interval (e.g., '9:25 AM', '10:25 AM', '1:12 PM'): ")
             if not validate_time_format(start_interval) or not validate_time_format(
                     end_interval):
                 continue
             while True:
+                print('Start Interval:', start_interval, 'End Interval:', end_interval)
                 trucks.deliver_packages(trucks_list, ds.graph_access, start_interval, end_interval)
+                trucks.print_all_package_status_delivery(trucks_list, start_interval, end_interval)
+                # Reset truck distances after printing when continue_delivery is True
+                for truck in trucks_list:
+                    truck.distances = []
                 continue_delivery = input("Continue delivery? (Y/N): ")
                 if continue_delivery.upper() == "Y":
-                    start_interval = input("Enter start interval (e.g., '8:25 AM', '9:35 AM', '12:03 AM'): ")
+                    start_interval = input("Enter start interval (e.g., '8:35 AM', '9:35 AM', '12:03 PM'): ")
                     end_interval = input("Enter end interval (e.g., '9:25 AM', '10:25 AM', '1:12 PM'): ")
                     if not validate_time_format(start_interval) or not validate_time_format(
                             end_interval):
@@ -88,13 +93,13 @@ def delivery_submenu():
                         print(f"Package ID: {package.package_id}")
                     package_id = int(input("Enter package ID: "))
                     while True:
-                        current_time = input("Enter current time (e.g., '8:25 AM', '9:35 AM', '12:03 PM'): ")
+                        current_time = input("Enter current time (e.g., '8:35 AM', '9:35 AM', '12:03 PM'): ")
                         if not validate_time_format(current_time):
                             continue
                         selected_truck.time_tracker.lookup_single_package_status(package_id, current_time)
                         continue_seeing = input("Continue seeing status with different time? (Y/N): ")
                         if continue_seeing.upper() == "Y":
-                            current_time = input("Enter current time (e.g., '8:25 AM', '9:35 AM', '12:03 PM'): ")
+                            current_time = input("Enter current time (e.g., '8:35 AM', '9:35 AM', '12:03 PM'): ")
                             if not validate_time_format(current_time):
                                 continue
                             selected_truck.time_tracker.lookup_single_package_status(package_id, current_time)
@@ -108,10 +113,7 @@ def delivery_submenu():
                 ui()
             print("Final status of all packages:")
             trucks.deliver_packages(trucks_list, ds.graph_access, "8:00 AM", "5:00 PM")
-            total_miles = 0
-            for truck in trucks_list:
-                total_miles += truck.time_tracker.calculate_total_miles_traveled()
-            print(f"Total miles traveled: {total_miles}")
+            trucks.print_all_package_status_delivery(trucks_list)
 
 
 def visualize_submenu():
