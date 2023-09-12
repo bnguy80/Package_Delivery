@@ -72,7 +72,7 @@ def two_opt_route(trucks, graph):
     # Only unique address on the route list (excluding hub)
     unique_route = [vertex for vertex in remove_repeated_vertices(trucks.route) if vertex != '4001 South 700 East']
     # Initialize the unique_route to the current_route
-    current_route = ['4001 South 700 East'] + unique_route + ['4001 South 700 East']
+    current_route = unique_route
     # Will be the best-optimized route
     best_route = current_route
     improvement = True

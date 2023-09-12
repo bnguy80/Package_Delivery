@@ -1,5 +1,7 @@
 import random
 
+from package_delivery.timeutil.time_util import convert_12h_to_24h_datetime
+
 # Initialize an empty set to track loaded packages across all trucks to avoid duplicate packages loaded among them
 track_package_id1 = set()
 
@@ -16,7 +18,7 @@ def get_all_packages_to_load(graph, track_package_id):
         track_package_id (list): The list of package IDs to track.
 
     Returns:
-        list: The list of packages to load.
+        list: The list of packages to load sorted by delivery deadline.
     """
     all_packages = []
     for vertex, packages in graph.get_vertices.items():
@@ -24,6 +26,13 @@ def get_all_packages_to_load(graph, track_package_id):
             if package.package_id not in track_package_id:
                 all_packages.append(package)
     # print("ALL_PACKAGES: ", all_packages)
+
+    return all_packages
+
+
+def sort_packages_by_delivery_deadline(all_packages):
+    # Sort the packages by delivery deadline
+    all_packages.sort(key=lambda x: convert_12h_to_24h_datetime(x.delivery_deadline))
     return all_packages
 
 
@@ -42,30 +51,51 @@ def has_load_packages(truck, package):
     delivery_deadline = package.delivery_deadline
     special_notes = package.special_notes
     package_id = package.package_id
-    # Check if the truck is full
-    if truck.get_package_count() >= 16:
-        return False
 
-    # Check if the package has a deadline of 9:00 AM or is one of the packages that must be delivered together
-    elif delivery_deadline == '9:00 AM' or package_id in [15, 14, 19, 16, 13, 20]:
-        if truck.truck_id == 1:
-            return True
-        return False
+    # Define constraints for Truck 1
+    if truck.truck_id == 1:
+        return delivery_deadline == '9:00 AM' or package_id in [15, 14, 19, 16, 13, 20, 31, 40]
 
-    # Check if the package has a deadline of 10:30 AM or must be delivered on truck 2
-    elif delivery_deadline == '10:30AM' or special_notes == 'Can only be on truck 2' or special_notes == ('Wrong '
-                                                                                                          'address '
-                                                                                                          'listed'):
-        if truck.truck_id == 2:
+    # Define constraints for Truck 2
+    if truck.truck_id == 2:
+        if package_id == 29:
             return True
-        return False
+        elif package_id == 32:
+            return False
+        elif package_id == 6:
+            return False
+        return 'Can only be on truck 2' in special_notes or 'Delayed on flight---will not arrive to depot until 9:05 am' in special_notes
 
-    # If the package has a deadline of EOD or is delayed on flight, it can be loaded on truck 3
-    elif delivery_deadline == 'EOD' or special_notes == 'Delayed on flight---will not arrive to depot until 9:05 am':
-        if truck.truck_id == 3:
+    # Define constraints for Truck 3
+    if truck.truck_id == 3:
+        # Work around for algorithmic constraints
+        if package_id == 13:
+            return False
+        elif package_id == 6:
             return True
+        elif package_id == 32:
+            return True
+        return (delivery_deadline == 'EOD' and 'None' in special_notes) or 'Wrong address listed' in special_notes
 
     return False  # Return False if none of the constraints are met
+
+
+# Sort the packages by distance from the current vertex
+def sort_packages_by_distance(truck, remaining_packages, graph):
+    """
+    Sorts the packages by their distance from the current vertex in the graph.
+
+    Args:
+        truck (Truck): The truck object representing the current state of the delivery truck.
+        remaining_packages (List[Package]): The list of remaining packages to be sorted.
+        graph (Graph): The graph object representing the delivery route.
+
+    Returns:
+        list: The sorted list of packages.
+    """
+    current_vertex = truck.route[-1]
+    remaining_packages.sort(key=lambda package: graph.get_edge_weight[current_vertex][package.address])
+    return remaining_packages
 
 
 # Check if the package has any constraints in its special notes
@@ -79,16 +109,15 @@ def has_package_constraints(package):
     Returns:
     - True if the package has constraints, False otherwise.
     """
-
-    excluded_package_ids = [15]  # List of package IDs to exclude
-
-    if package.package_id in excluded_package_ids:
-        return True  # Package has constraints, so return True
     special_notes = package.special_notes
+    if package.package_id in [13, 6, 32, 29]:
+        return True
     return any(
-        "Can only be on truck" in special_notes or
-        "Delayed on flight---will not arrive to depot until 9:05 am" in special_notes or
-        "Wrong address listed" in special_notes or "Must be delivered with" in special_notes
+        "Can only be on truck 2" in special_notes or
+        "Wrong address listed" in special_notes or
+        'Must be delivered with 15, 19' in special_notes or
+        'Must be delivered with 13, 15' in special_notes or
+        'Must be delivered with 13, 19' in special_notes
         for _ in special_notes
     )
 
@@ -106,23 +135,6 @@ def randomize_packages(packages):
     """
     random.shuffle(packages)
     return packages
-
-
-# Sort the packages by distance from the current vertex
-def sort_packages_by_distance(truck, remaining_packages, graph):
-    """
-    Sorts the packages by their distance from the current vertex in the graph.
-
-    Args:
-        truck (Truck): The truck object representing the current state of the delivery truck.
-        remaining_packages (List[Package]): The list of remaining packages to be sorted.
-        graph (Graph): The graph object representing the delivery route.
-
-    Returns:
-        None
-    """
-    current_vertex = truck.route[-1]
-    remaining_packages.sort(key=lambda package: graph.get_edge_weight[current_vertex][package.address])
 
 
 # Load packages onto trucks with specific delivery_deadline and constraints required for each truck
@@ -232,7 +244,6 @@ def get_left_over_packages(graph, track_package_id):
             if package.package_id not in track_package_id:
                 left_over.append(package)
                 track_package_id.add(package.package_id)
-
     return left_over
 
 
@@ -258,7 +269,6 @@ def load_left_over_packages(trucks, left_over, track_package_id):
 
     # Flatten the left_over list
     flattened_list = [package for sublist in left_over for package in sublist]
-
     # Iterate over the flattened list
     for package_left in flattened_list:
         # Check if the number of packages in the truck is less than 16
