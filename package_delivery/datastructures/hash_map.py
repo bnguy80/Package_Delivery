@@ -317,7 +317,7 @@ class HashMap:
                         delivery_deadline = package[5]
                         mass = package[6]
                         special_notes = package[7]
-                        delivery_status = 'Pending'
+                        delivery_status = 'AT_HUB'
 
                         # Key to direct hash
                         key = package_id

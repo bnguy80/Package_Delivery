@@ -121,7 +121,7 @@ class TimeTracker:
                 elif current_time < before_load:
                     status_info_copy['status'] = 'AT_HUB'
 
-                print("Package: ", package, " - Package Status: ", status_info_copy['status'],
+                print("Package ID: ", package.package_id, " - Address: ", package.address, " - City: ", package.city, " - State: ", package.state, " - Zipcode: ", package.zipcode, " - Delivery Deadline: ", package.delivery_deadline, " - Mass: ", package.mass, " - Special Notes: ", package.special_notes, " - Package Status: ", status_info_copy['status'],
                       "Package Time Delivered: ", status_info_copy['time_delivered'])
                 return
 
