@@ -37,7 +37,7 @@ class TimeTracker:
 
         # Set the current time for each truck based on its truck ID
         if truck_id == 1:
-            self.track_truck_current_time[truck_id] = 8.1688  # Set truck 1 start time to string 8:00 AM
+            self.track_truck_current_time[truck_id] = 8.1688  # Set truck 1 start time to string 8:10 AM
         elif truck_id == 2:
             self.track_truck_current_time[truck_id] = 9.0844  # Set truck 2 start time 9:05 AM
         elif truck_id == 3:
@@ -47,7 +47,7 @@ class TimeTracker:
     def reset_truck_current_time(self, truck_id):
         """Reset the track_truck_current_time for the truck to its initial value."""
         if truck_id == 1:
-            self.track_truck_current_time[truck_id] = 8.1688  # Reset truck 1 start time to 8:00 AM
+            self.track_truck_current_time[truck_id] = 8.1688  # Reset truck 1 start time to 8:10 AM
         elif truck_id == 2:
             self.track_truck_current_time[truck_id] = 9.0844  # Reset truck 2 start time to 9:05 AM
         elif truck_id == 3:
@@ -186,7 +186,10 @@ class TimeTracker:
         """
         print("Package Status:")
         for package, status in self.packages_status.items():
-            print(package, self.packages_status[package])
+            print(f"Package: {package}")
+            for key, value in status.items():
+                print(f"  {key}: {value}")
+            print("----------------------")
 
     # Initialize the package status to 'AT_HUB' after loading all on trucks
     # Associate all packages with their truck they are loaded onto
@@ -274,21 +277,6 @@ class TimeTracker:
         # Update miles traveled for the current truck
         current_miles_traveled = self.track_miles_traveled[self.__id]
         self.track_miles_traveled[self.__id] = current_miles_traveled + miles
-
-    # Print miles traveled by current truck
-    def print_current_truck_miles(self):
-        """
-        Print the number of miles traveled by a specific truck.
-
-        Parameters:
-        - None
-
-        Returns:
-        - None
-        """
-        miles_traveled = self.track_miles_traveled[self.__id]
-        print("MILES_TRAVELED: ", miles_traveled, " miles")
-        print()
 
     def calculate_total_miles_traveled(self):
         """
@@ -410,16 +398,48 @@ class TimeTracker:
                 time_delivered = util.convert_time_str_to_datetime(time_delivered_str)
                 time_start_delivery = util.convert_time_str_to_datetime(time_to_start_delivery_str)
                 if time_start_delivery > start_time and time_start_delivery > end_time:
-                    filtered_packages.append([package.package_id, package.address, status_info['status'], package.delivery_deadline, status_info['time_delivered'], status_info['truck']])
+                    filtered_packages.append(format_output(package.package_id, package.address, status_info['status'],
+                                                           status_info['delivery_deadline'],
+                                                           status_info['time_delivered'], status_info['truck']))
                 elif start_time <= time_delivered <= end_time or time_delivered < start_time:
                     status_info_copy = status_info.copy()
                     status_info_copy['status'] = 'DELIVERED'
-                    filtered_packages.append([package.package_id, package.address, status_info_copy['status'], package.delivery_deadline, status_info_copy['time_delivered'], status_info_copy['truck']])
+                    filtered_packages.append(
+                        format_output(package.package_id, package.address, status_info_copy['status'],
+                                      status_info['delivery_deadline'], status_info_copy['time_delivered'],
+                                      status_info_copy['truck']))
                 elif time_delivered > end_time > time_start_delivery:
                     status_info_copy = status_info.copy()
                     status_info_copy['status'] = 'IN_TRANSIT'
-                    filtered_packages.append([package.package_id, package.address, status_info_copy['status'], package.delivery_deadline, status_info_copy['time_delivered'], status_info_copy['truck']])
+                    filtered_packages.append(
+                        format_output(package.package_id, package.address, status_info_copy['status'],
+                                      status_info['delivery_deadline'], status_info_copy['time_delivered'],
+                                      status_info_copy['truck']))
             except ValueError as e:
                 print(f"Error parsing time for package {package}: {e}, time_delivered: {0}")
 
         return filtered_packages
+
+
+# Function to format filtered packages from get_filtered_packages_by_time_range
+def format_output(package_id, address, status, delivery_deadline, time_delivered, truck):
+    """
+    Format the output of the package information.
+
+    Parameters:
+        package_id (int): The ID of the package.
+        address (str): The address of the package.
+        status (str): The status of the package.
+        delivery_deadline (str): The deadline for delivery.
+        time_delivered (str): The time the package was delivered.
+        truck (str): The truck used for delivery.
+
+    Returns:
+        str: The formatted output of the package information.
+    """
+    return (f"Package ID: {package_id} | "
+            f"Address: {address} | "
+            f"Status: {status} | "
+            f"Delivery Deadline: {delivery_deadline} | "
+            f"Time Delivered: {time_delivered} | "
+            f"Truck: {truck}")

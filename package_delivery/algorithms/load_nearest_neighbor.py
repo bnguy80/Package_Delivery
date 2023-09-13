@@ -16,6 +16,8 @@ def load_packages_nearest_neighbor(trucks, graph, track_package_id):
     Returns:
     None
     """
+    MAX_PACKAGE_COUNT = 15
+
     for truck in trucks:
         # Start from the hub
         current_vertex = '4001 South 700 East'
@@ -55,7 +57,7 @@ def load_packages_nearest_neighbor(trucks, graph, track_package_id):
 
         all_packages_for_truck = constrained_packages + unconstrained_packages
 
-        while truck.get_package_count() < 15:
+        while truck.get_package_count() < MAX_PACKAGE_COUNT:
             min_distance = math.inf
             nearest_package = None
 
@@ -77,4 +79,5 @@ def load_packages_nearest_neighbor(trucks, graph, track_package_id):
                 # Break out of the while loop if there are no more packages to load
                 break
         # Update addresses so visualization works
+        truck.route.append('4001 South 700 East')
         truck.visualize.update_address(truck.route, truck.truck_id)

@@ -30,12 +30,6 @@ def get_all_packages_to_load(graph, track_package_id):
     return all_packages
 
 
-def sort_packages_by_delivery_deadline(all_packages):
-    # Sort the packages by delivery deadline
-    all_packages.sort(key=lambda x: convert_12h_to_24h_datetime(x.delivery_deadline))
-    return all_packages
-
-
 # Check if the truck can load the packages based on constraints
 def has_load_packages(truck, package):
     """
@@ -54,10 +48,12 @@ def has_load_packages(truck, package):
 
     # Define constraints for Truck 1
     if truck.truck_id == 1:
+        # package_ids other than 15, 14, 19, 16, 13, 20 are working around for algorithmic constraints
         return delivery_deadline == '9:00 AM' or package_id in [15, 14, 19, 16, 13, 20, 31, 40]
 
     # Define constraints for Truck 2
     if truck.truck_id == 2:
+        # Work around for algorithmic constraints
         if package_id == 29:
             return True
         elif package_id == 32:
@@ -99,6 +95,7 @@ def sort_packages_by_distance(truck, remaining_packages, graph):
 
 
 # Check if the package has any constraints in its special notes
+# to ensure that constrained packages cannot be loaded
 def has_package_constraints(package):
     """
     Check if a package has any constraints.
@@ -110,14 +107,12 @@ def has_package_constraints(package):
     - True if the package has constraints, False otherwise.
     """
     special_notes = package.special_notes
+    # Work around for algorithmic constraints
     if package.package_id in [13, 6, 32, 29]:
         return True
     return any(
         "Can only be on truck 2" in special_notes or
-        "Wrong address listed" in special_notes or
-        'Must be delivered with 15, 19' in special_notes or
-        'Must be delivered with 13, 15' in special_notes or
-        'Must be delivered with 13, 19' in special_notes
+        "Wrong address listed" in special_notes
         for _ in special_notes
     )
 
@@ -142,7 +137,7 @@ def load_packages(trucks, graph, delivery_deadline, constraints, track_package_i
     """
     Loads packages into trucks based on delivery constraints and deadlines.
 
-    Args:
+    Parameters:
         trucks (List): The list of trucks to load packages onto.
         graph (Graph): The graph object representing the delivery locations and distances.
         delivery_deadline (str): The deadline for delivery, either "EOD", "9:00 AM", or "10:30 AM".

@@ -35,6 +35,8 @@ gui/: (not implemented currently) Graphical user interface components.
 
 visualization/: Scripts for visualizing truck routes.
 
+statuschecks/: Screenshots of all 40 package statuses at different points in time during delivery
+
 **Prerequisites:**
 
 Python 3.11
