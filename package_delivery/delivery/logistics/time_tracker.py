@@ -162,7 +162,8 @@ class TimeTracker:
                     new_zipcode,
                     package.delivery_deadline,
                     package.mass,
-                    new_special_notes
+                    new_special_notes,
+                    package.delivery_status
                 )
                 # Remove old package entry
                 del self.packages_status[package]

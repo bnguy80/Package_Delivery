@@ -17,9 +17,10 @@ class HashMapEntry:
         delivery_deadline (str): The delivery deadline of the package.
         mass (str): The mass of the package.
         special_notes (str): Any special notes for the package.
+        delivery_status (str): The delivery status of the package.
     """
 
-    def __init__(self, package_id, address, city, state, zipcode, delivery_deadline, mass, special_notes):
+    def __init__(self, package_id, address, city, state, zipcode, delivery_deadline, mass, special_notes, delivery_status):
         """
         Initialize a package object.
 
@@ -32,6 +33,7 @@ class HashMapEntry:
             delivery_deadline (str): The delivery deadline of the package.
             mass (str): The mass of the package.
             special_notes (str): Any special notes for the package.
+            delivery_status (str): The delivery status of the package.
 
         Raises:
             TypeError: If any of the arguments have an invalid type.
@@ -55,6 +57,8 @@ class HashMapEntry:
             raise TypeError('Mass must be a string')
         if not isinstance(special_notes, str):
             raise TypeError('Special notes must be a string')
+        if not isinstance(delivery_status, str):
+            raise TypeError('Delivery status must be a string')
 
         self.package_id = package_id
         self.address = address
@@ -64,6 +68,7 @@ class HashMapEntry:
         self.delivery_deadline = delivery_deadline
         self.mass = mass
         self.special_notes = special_notes
+        self.delivery_status = delivery_status
 
     # Overwrite print(HashMapEntry) otherwise it will print object reference, 7/14/23 working for now
     def __repr__(self):
@@ -73,7 +78,7 @@ class HashMapEntry:
         Returns:
             str: A string representation of the object.
         """
-        return f'<{self.package_id} {self.address} {self.city} {self.state} {self.zipcode} {self.delivery_deadline} {self.mass} {self.special_notes}>'
+        return f'<{self.package_id} {self.address} {self.city} {self.state} {self.zipcode} {self.delivery_deadline} {self.mass} {self.special_notes} {self.delivery_status}>'
 
 
 class HashMap:
@@ -312,13 +317,14 @@ class HashMap:
                         delivery_deadline = package[5]
                         mass = package[6]
                         special_notes = package[7]
+                        delivery_status = 'Pending'
 
                         # Key to direct hash
                         key = package_id
 
                         # HashMapEntry object
                         value = HashMapEntry(package_id, address, city, state, zipcode, delivery_deadline, mass,
-                                             special_notes)
+                                             special_notes, delivery_status)
                         self._insert_package(key, value)
                     except Exception as e:
                         print(f"Error occurred while processing package: {e}")
