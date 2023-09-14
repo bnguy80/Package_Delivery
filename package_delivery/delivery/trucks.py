@@ -357,13 +357,6 @@ def deliver_packages(trucks, graph, start_interval, end_interval):
                 filtered_packages = current_truck.time_tracker.get_filtered_packages_by_time_range(start_interval,
                                                                                                    end_interval)
                 current_truck.insert_filtered_packages(filtered_packages)
-                print("Start time:", start_interval, "End time:", end_interval)
-                print('Truck:', truck_name)
-                print(f"Packages on truck {current_truck.truck_id}:", len(current_truck.filtered_packages))
-                current_truck.print_filtered_packages()
-                print("TRUCK ROUTE TRAVELED FROM HUB:", current_truck.route)
-                distances[current_truck.truck_id] = sum(current_truck.get_distances())
-                print(f'Total Distance Travelled: {distances[current_truck.truck_id]} \n')
 
 
 # After truck 1's delivery is completed, deliver truck 3's packages
@@ -380,7 +373,6 @@ def deliver_truck3_packages(truck3, graph, start_interval, end_interval):
     Returns:
         None
     """
-    distances = 0
     truck_name = truck3.truck_name
     time_tracker = truck3.time_tracker
     # Calculate start time for truck 3 based on truck 1's return time
@@ -414,13 +406,6 @@ def deliver_truck3_packages(truck3, graph, start_interval, end_interval):
                                        new_special_notes, end_interval)
     filtered_packages = truck3.time_tracker.get_filtered_packages_by_time_range(start_interval, end_interval)
     truck3.insert_filtered_packages(filtered_packages)
-    print("Start time:", start_interval, "End time:", end_interval)
-    print('Truck:', truck_name)
-    print(f"Packages on truck {truck3.truck_id}:", len(truck3.filtered_packages))
-    truck3.print_filtered_packages()
-    print("TRUCK ROUTE TRAVELED FROM HUB:", truck3.route)
-    distances += sum(truck3.get_distances())
-    print(f'Total Distance Travelled: {distances} miles \n')
 
 
 def print_all_package_status_delivery(truck_list, start_interval, end_interval):
@@ -433,6 +418,19 @@ def print_all_package_status_delivery(truck_list, start_interval, end_interval):
     print('Total Number of Packages:', len(all_packages))
     print('All Packages:', all_packages)
     print(f'Total Distance Travelled: {distances} miles \n')
+
+
+def print_truck_delivery_status(trucks, start_interval, end_interval):
+    distances = {}
+    for truck in trucks:
+        distances[truck.truck_id] = 0
+        print("Start time:", start_interval, "End time:", end_interval)
+        print('Truck:', truck.truck_name)
+        print(f"Packages on truck {truck.truck_id}:", len(truck.filtered_packages))
+        truck.print_filtered_packages()
+        print("TRUCK ROUTE TRAVELED FROM HUB:", truck.route)
+        distances[truck.truck_id] = sum(truck.get_distances())
+        print(f'Total Distance Travelled: {distances[truck.truck_id]} miles \n')
 
 
 # Delivered by 9:00am, the constraint of having multiple packages on the same truck delivered together, Truck 1
@@ -454,7 +452,9 @@ medium_priority.time_tracker.initialize_multiple_package_status(medium_priority.
 # and current_time attributes to reflect the time it will start delivering packages
 low_priority.time_tracker.initialize_multiple_package_status(low_priority.get_packages(), 'AT_HUB')
 
-# trucks_list = [high_priority, medium_priority, low_priority]
-# deliver_packages(trucks_list, ds.graph_access, '8:00 AM', '5:00 PM')
-# print_all_package_status_delivery(trucks_list, '8:00 AM', '5:00 PM')
+trucks_list = [high_priority, medium_priority, low_priority]
+# deliver_packages(trucks_list, ds.graph_access, '7:00 AM', '8:00 AM')
+# print_all_package_status_delivery(trucks_list, '7:00 AM', '8:00 AM')
+# print_truck_delivery_status(trucks_list, '7:00 AM', '8:00 AM')
+# high_priority.time_tracker.lookup_single_package_status(13, '9:00 AM')
 # high_priority.visualize.visualize_truck_route(high_priority.truck_id, high_priority.truck_name)
