@@ -33,7 +33,6 @@ def load_packages_submenu():
 
 
 def delivery_submenu():
-    has_started_delivery = False
     while True:
         sub_menu = input(
             "[0] Exit\n"
@@ -45,7 +44,6 @@ def delivery_submenu():
             print("Returning to main menu")
             break
         if sub_menu == "1":
-            has_started_delivery = True
             start_interval = input("Enter start interval (e.g., '8:35 AM', '9:35 AM', '12:03 PM'): ")
             end_interval = input("Enter end interval (e.g., '9:25 AM', '10:25 AM', '1:12 PM'): ")
             if not validate_time_format(start_interval) or not validate_time_format(
@@ -54,6 +52,7 @@ def delivery_submenu():
             while True:
                 print('Start Interval:', start_interval, 'End Interval:', end_interval)
                 trucks.deliver_packages(trucks_list, ds.graph_access, start_interval, end_interval)
+                trucks.print_truck_delivery_status(trucks_list, start_interval, end_interval)
                 trucks.print_all_package_status_delivery(trucks_list, start_interval, end_interval)
                 # Reset truck distances after printing when continue_delivery is True
                 for truck in trucks_list:
@@ -68,9 +67,6 @@ def delivery_submenu():
                 else:
                     break
         if sub_menu == "2":
-            if not has_started_delivery:
-                print("Start delivery first!")
-                ui()
             while True:
                 print("Select Truck ID(1-3) or type 'exit' to leave:")
                 truck_choice = input()
@@ -101,7 +97,7 @@ def delivery_submenu():
                             while not validate_time_format(current_time):
                                 print("Invalid time format. Try again.")
                                 current_time = input("Enter current time (e.g., '8:35 AM', '9:35 AM', '12:03 PM'): ")
-
+                            trucks.deliver_packages(trucks_list, ds.graph_access, current_time, current_time)
                             selected_truck.time_tracker.lookup_single_package_status(package_id, current_time)
 
                             continue_seeing = input("See another package status? (Y/N): ")
@@ -110,11 +106,9 @@ def delivery_submenu():
                 else:
                     print("Invalid choice. Please select a valid Truck ID.")
         if sub_menu == "3":
-            if not has_started_delivery:
-                print("Start delivery first!")
-                ui()
             print("Final status of all packages:")
             trucks.deliver_packages(trucks_list, ds.graph_access, "8:00 AM", "5:00 PM")
+            trucks.print_truck_delivery_status(trucks_list, "8:00 AM", "5:00 PM")
             start_interval = "8:00 AM"
             end_interval = "5:00 PM"
             trucks.print_all_package_status_delivery(trucks_list, start_interval, end_interval)
