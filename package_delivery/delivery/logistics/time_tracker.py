@@ -1,3 +1,4 @@
+from package_delivery.datastructures import graph_access
 from package_delivery.datastructures.hash_map import HashMapEntry
 from package_delivery.timeutil import time_util as util
 
@@ -97,6 +98,7 @@ class TimeTracker:
 
     # Lookup single package status by package_id and current_time to determine if package is delivered or in transit
     def lookup_single_package_status(self, package_id, current_time):
+        from package_delivery.delivery.trucks import deliver_packages
         """
         Looks up single the status of a package based on the provided package ID and current time.
 
@@ -121,14 +123,13 @@ class TimeTracker:
                 elif current_time < before_load:
                     status_info_copy['status'] = 'AT_HUB'
 
-                print("Package ID: ", package.package_id, " - Address: ", package.address, " - City: ", package.city, " - State: ", package.state, " - Zipcode: ", package.zipcode, " - Delivery Deadline: ", package.delivery_deadline, " - Mass: ", package.mass, " - Special Notes: ", package.special_notes, " - Package Status: ", status_info_copy['status'],
+                print("Package ID: ", package.package_id, " - Address: ", package.address, " - City: ", package.city,
+                      " - State: ", package.state, " - Zipcode: ", package.zipcode, " - Delivery Deadline: ",
+                      package.delivery_deadline, " - Mass: ", package.mass, " - Special Notes: ", package.special_notes,
+                      " - Package Status: ", status_info_copy['status'],
                       "Package Time Delivered: ", status_info_copy['time_delivered'])
-                return
-
-        print("Package not found")
 
     # Update package in package_status dictionary
-
     def update_package_status(self, package, new_address, new_city, new_state, new_zipcode, new_special_notes,
                               current_time):
         """
