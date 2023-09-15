@@ -9,7 +9,8 @@ and other constraints such as delivery deadlines and special instructions.
 
 **Features:**
 
-Dynamic Route Optimization: The program uses algorithms like Nearest Neighbor, Dijkstra's Shortest Path, and Two-Opt to determine the best route for package delivery.
+Dynamic Route Optimization: The program uses algorithms like Nearest Neighbor, Dijkstra's Shortest Path, and Two-Opt to
+determine the best route for package delivery.
 
 Real-Time Fuel Price Updates (not present in UI currently): Integrates with an API to fetch current fuel prices,
 allowing the route optimization to also consider fuel costs.
@@ -42,7 +43,6 @@ statuschecks/: Screenshots of all 40 package statuses at different points in tim
 Python 3.11
 
 Required Python packages as listed in requirements.txt.
-
 
 **Installation & Setup:**
 

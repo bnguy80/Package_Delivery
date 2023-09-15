@@ -20,7 +20,8 @@ class HashMapEntry:
         delivery_status (str): The delivery status of the package.
     """
 
-    def __init__(self, package_id, address, city, state, zipcode, delivery_deadline, mass, special_notes, delivery_status):
+    def __init__(self, package_id, address, city, state, zipcode, delivery_deadline, mass, special_notes,
+                 delivery_status):
         """
         Initialize a package object.
 

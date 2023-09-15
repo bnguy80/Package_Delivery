@@ -1,7 +1,5 @@
 import random
 
-from package_delivery.timeutil.time_util import convert_12h_to_24h_datetime
-
 # Initialize an empty set to track loaded packages across all trucks to avoid duplicate packages loaded among them
 track_package_id1 = set()
 
@@ -73,7 +71,8 @@ def has_load_packages(truck, package):
             return False
         elif package_id == 32:
             return True
-        return (delivery_deadline == 'EOD' and 'None' in special_notes) or 'Wrong address listed' in special_notes or 'Delayed on flight---will not arrive to depot until 9:05 am' in special_notes
+        return (
+                    delivery_deadline == 'EOD' and 'None' in special_notes) or 'Wrong address listed' in special_notes or 'Delayed on flight---will not arrive to depot until 9:05 am' in special_notes
 
     return False  # Return False if none of the constraints are met
 

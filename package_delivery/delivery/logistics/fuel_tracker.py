@@ -1,6 +1,7 @@
-import requests
 import csv
 from pathlib import Path
+
+import requests
 
 
 # current_directory = Path(__file__).parent

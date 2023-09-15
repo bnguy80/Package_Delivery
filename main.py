@@ -1,9 +1,9 @@
 # Student ID: 003964281
 
-from package_delivery.delivery import trucks
-from package_delivery.timeutil.time_util import validate_time_format
-from package_delivery.delivery.trucks import high_priority, medium_priority, low_priority
 from package_delivery import datastructures as ds
+from package_delivery.delivery import trucks
+from package_delivery.delivery.trucks import high_priority, medium_priority, low_priority
+from package_delivery.timeutil.time_util import validate_time_format
 
 trucks_list = [high_priority, medium_priority, low_priority]
 
