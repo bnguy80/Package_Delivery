@@ -466,11 +466,11 @@ medium_priority.time_tracker.initialize_multiple_package_status(medium_priority.
 # and current_time attributes to reflect the time it will start delivering packages
 low_priority.time_tracker.initialize_multiple_package_status(low_priority.get_packages(), 'AT_HUB')
 
-trucks_list = [high_priority, medium_priority, low_priority]
-start_interval = '8:00 AM'
-end_interval = '8:00 AM'
-deliver_packages(trucks_list, ds.graph_access, start_interval, end_interval)
-print_truck_delivery_status(trucks_list, end_interval)
-print_all_package_status_delivery(trucks_list)
+# trucks_list = [high_priority, medium_priority, low_priority]
+# start_interval = '8:15 AM'
+# end_interval = '8:15 AM'
+# deliver_packages(trucks_list, ds.graph_access, start_interval, end_interval)
+# print_truck_delivery_status(trucks_list, end_interval)
+# print_all_package_status_delivery(trucks_list)
 # high_priority.time_tracker.lookup_single_package_status(13, '9:00 AM')
 # high_priority.visualize.visualize_truck_route(high_priority.truck_id, high_priority.truck_name)
