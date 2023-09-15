@@ -48,6 +48,8 @@ def has_load_packages(truck, package):
 
     # Define constraints for Truck 1
     if truck.truck_id == 1:
+        if package_id == 25:
+            return False
         # package_ids other than 15, 14, 19, 16, 13, 20 are working around for algorithmic constraints
         return delivery_deadline == '9:00 AM' or package_id in [15, 14, 19, 16, 13, 20, 31, 40]
 
@@ -59,8 +61,8 @@ def has_load_packages(truck, package):
         elif package_id == 32:
             return False
         elif package_id == 6:
-            return False
-        return 'Can only be on truck 2' in special_notes or 'Delayed on flight---will not arrive to depot until 9:05 am' in special_notes
+            return True
+        return 'Can only be on truck 2' in special_notes
 
     # Define constraints for Truck 3
     if truck.truck_id == 3:
@@ -68,10 +70,10 @@ def has_load_packages(truck, package):
         if package_id == 13:
             return False
         elif package_id == 6:
-            return True
+            return False
         elif package_id == 32:
             return True
-        return (delivery_deadline == 'EOD' and 'None' in special_notes) or 'Wrong address listed' in special_notes
+        return (delivery_deadline == 'EOD' and 'None' in special_notes) or 'Wrong address listed' in special_notes or 'Delayed on flight---will not arrive to depot until 9:05 am' in special_notes
 
     return False  # Return False if none of the constraints are met
 
@@ -108,11 +110,12 @@ def has_package_constraints(package):
     """
     special_notes = package.special_notes
     # Work around for algorithmic constraints
-    if package.package_id in [13, 6, 32, 29]:
+    if package.package_id in [13, 6, 32, 29, ]:
         return True
     return any(
         "Can only be on truck 2" in special_notes or
-        "Wrong address listed" in special_notes
+        "Wrong address listed" in special_notes or
+        "Delayed on flight---will not arrive to depot until 9:05 am" in special_notes
         for _ in special_notes
     )
 

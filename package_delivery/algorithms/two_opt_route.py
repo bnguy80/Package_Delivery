@@ -97,12 +97,14 @@ def two_opt_route(trucks, graph):
         current_route = best_route
     # Update the truck's route with the optimized route
     trucks.route = best_route
-    trucks.visualize.update_address(trucks.route, trucks.truck_id)
     # Optimize the order of packages to reflect the optimized route
     optimized_packages = []
+    added_packages = set()  # Keep track of packages already added
     for address in current_route:
         for package in trucks.get_packages():
-            if package.address == address:
+            if package.address == address and package not in added_packages:
                 optimized_packages.append(package)
-                break
+                added_packages.add(package)  # Mark the package as added
     trucks.packages = optimized_packages
+    # Make sure the address is updated for visualization
+    trucks.visualize.update_address(trucks.route, trucks.truck_id)

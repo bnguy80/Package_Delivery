@@ -98,7 +98,6 @@ class TimeTracker:
 
     # Lookup single package status by package_id and current_time to determine if package is delivered or in transit
     def lookup_single_package_status(self, package_id, current_time):
-        from package_delivery.delivery.trucks import deliver_packages
         """
         Looks up single the status of a package based on the provided package ID and current time.
 
@@ -109,18 +108,19 @@ class TimeTracker:
         Returns:
             None
         """
-        before_load = util.convert_12h_to_24h_datetime('8:00 AM')
         current_time = util.convert_12h_to_24h_datetime(current_time)
         for package, status_info in self.packages_status.items():
             if package.package_id == package_id:
                 time_delivered_str = status_info['time_delivered']
                 time_delivered = util.convert_time_str_to_datetime(time_delivered_str)
+                time_to_start_delivery_str = status_info['time_to_start_delivery']
+                time_to_start_delivery = util.convert_time_str_to_datetime(time_to_start_delivery_str)
                 status_info_copy = status_info.copy()
-                if current_time >= time_delivered and current_time >= before_load:
+                if current_time >= time_delivered:
                     status_info_copy['status'] = 'DELIVERED'
-                elif time_delivered > current_time >= before_load:
+                elif time_to_start_delivery <= current_time < time_delivered:
                     status_info_copy['status'] = 'IN_TRANSIT'
-                elif current_time < before_load:
+                else:
                     status_info_copy['status'] = 'AT_HUB'
 
                 print("Package ID: ", package.package_id, " - Address: ", package.address, " - City: ", package.city,

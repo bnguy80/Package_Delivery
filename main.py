@@ -6,30 +6,6 @@ from package_delivery.delivery.trucks import high_priority, medium_priority, low
 from package_delivery import datastructures as ds
 
 trucks_list = [high_priority, medium_priority, low_priority]
-has_packages_loaded = False
-
-
-def load_packages_submenu():
-    global has_packages_loaded
-    while True:
-        sub_menu = input(
-            "[0] Exit\n"
-            "[1] Load Trucks with Packages?\n"
-        )
-        if sub_menu == "0":
-            print("Returning to main menu")
-            break
-        elif sub_menu == "1":
-            has_packages_loaded = True
-            print("Truck1, Number of packages: ", high_priority.get_package_count())
-            high_priority.print_packages()
-            print("\n")
-            print("Truck2, Number of packages: ", medium_priority.get_package_count())
-            medium_priority.print_packages()
-            print("\n")
-            print("Truck3, Number of packages: ", low_priority.get_package_count())
-            low_priority.print_packages()
-            break
 
 
 def delivery_submenu():
@@ -44,74 +20,61 @@ def delivery_submenu():
             print("Returning to main menu")
             break
         if sub_menu == "1":
-            start_interval = input("Enter start interval (e.g., '8:35 AM', '9:35 AM', '12:03 PM'): ")
-            end_interval = input("Enter end interval (e.g., '9:25 AM', '10:25 AM', '1:12 PM'): ")
-            if not validate_time_format(start_interval) or not validate_time_format(
-                    end_interval):
+            current_time = input("Enter time (e.g., '8:35 AM', '9:35 AM', '12:03 PM'): ")
+            if not validate_time_format(current_time) or not validate_time_format(
+                    current_time):
                 continue
             while True:
-                print('Start Interval:', start_interval, 'End Interval:', end_interval)
-                trucks.deliver_packages(trucks_list, ds.graph_access, start_interval, end_interval)
-                trucks.print_truck_delivery_status(trucks_list, start_interval, end_interval)
-                trucks.print_all_package_status_delivery(trucks_list, start_interval, end_interval)
+                print('Current Time:', current_time)
+                trucks.deliver_packages(trucks_list, ds.graph_access, current_time, current_time)
+                trucks.print_truck_delivery_status(trucks_list, current_time)
+                trucks.print_all_package_status_delivery(trucks_list)
                 # Reset truck distances after printing when continue_delivery is True
                 for truck in trucks_list:
                     truck.distances = []
                 continue_delivery = input("Continue delivery? (Y/N): ")
                 if continue_delivery.upper() == "Y":
-                    start_interval = input("Enter start interval (e.g., '8:35 AM', '9:35 AM', '12:03 PM'): ")
-                    end_interval = input("Enter end interval (e.g., '9:25 AM', '10:25 AM', '1:12 PM'): ")
-                    if not validate_time_format(start_interval) or not validate_time_format(
-                            end_interval):
+                    current_time = input("Enter time (e.g., '8:35 AM', '9:35 AM', '12:03 PM'): ")
+                    if not validate_time_format(current_time) or not validate_time_format(
+                            current_time):
                         continue
                 else:
                     break
         if sub_menu == "2":
+            print("All Package IDs:")
+            # Display all package IDs from all trucks
+            for truck in trucks_list:
+                for package in truck.get_packages():
+                    print(f"Package ID: {package.package_id} (Truck {truck.truck_id})")
             while True:
-                print("Select Truck ID(1-3) or type 'exit' to leave:")
-                truck_choice = input()
 
-                if truck_choice == 'exit':
+                package_id = int(input("Enter package ID or '0' to exit: "))
+
+                if package_id == 0:
                     break
 
-                if truck_choice.isdigit() and 1 <= int(truck_choice) <= 3:
-                    selected_truck = None
-                    for truck in trucks_list:
-                        if truck.truck_id == int(truck_choice):
-                            selected_truck = truck
+                current_time = input("Enter current time (e.g., '8:35 AM', '9:35 AM', '12:03 PM'): ")
+                while not validate_time_format(current_time):
+                    print("Invalid time format. Try again.")
+                    current_time = input("Enter current time (e.g., '8:35 AM', '9:35 AM', '12:03 PM'): ")
+
+                trucks.deliver_packages(trucks_list, ds.graph_access, current_time, current_time)
+
+                # Find the right truck and display the package status
+                for truck in trucks_list:
+                    for package in truck.get_packages():
+                        if package.package_id == package_id:
+                            truck.time_tracker.lookup_single_package_status(package_id, current_time)
                             break
 
-                    if selected_truck:
-                        print(f"Selected Truck {selected_truck.truck_id}")
-
-                        while True:
-                            print("Package IDs on the truck:")
-                            for package in selected_truck.get_packages():
-                                print(f"Package ID: {package.package_id}")
-
-                            package_id = int(input("Enter package ID or '0' to select another truck: "))
-                            if package_id == 0:
-                                break
-
-                            current_time = input("Enter current time (e.g., '8:35 AM', '9:35 AM', '12:03 PM'): ")
-                            while not validate_time_format(current_time):
-                                print("Invalid time format. Try again.")
-                                current_time = input("Enter current time (e.g., '8:35 AM', '9:35 AM', '12:03 PM'): ")
-                            trucks.deliver_packages(trucks_list, ds.graph_access, current_time, current_time)
-                            selected_truck.time_tracker.lookup_single_package_status(package_id, current_time)
-
-                            continue_seeing = input("See another package status? (Y/N): ")
-                            if continue_seeing.upper() == "N":
-                                break
-                else:
-                    print("Invalid choice. Please select a valid Truck ID.")
+                continue_seeing = input("See another package status? (Y/N): ")
+                if continue_seeing.upper() == "N":
+                    break
         if sub_menu == "3":
             print("Final status of all packages:")
             trucks.deliver_packages(trucks_list, ds.graph_access, "8:00 AM", "5:00 PM")
-            trucks.print_truck_delivery_status(trucks_list, "8:00 AM", "5:00 PM")
-            start_interval = "8:00 AM"
-            end_interval = "5:00 PM"
-            trucks.print_all_package_status_delivery(trucks_list, start_interval, end_interval)
+            trucks.print_truck_delivery_status(trucks_list, "5:00 PM")
+            trucks.print_all_package_status_delivery(trucks_list)
 
 
 def visualize_submenu():
@@ -166,14 +129,12 @@ def visualize_submenu():
 
 
 def ui():
-    global has_packages_loaded
     main_menu = input(
         "[0] Exit\n"
         "[1] View All Package Details\n"
         "[2] View Details of a Specific Package (using Package ID) \n"
-        "[3] Load Trucks with Packages \n"
-        "[4] Run Delivery Simulation \n"
-        "[5] Visualize delivery simulation \n"
+        "[3] Run Delivery Simulation \n"
+        "[4] Visualize delivery simulation \n"
     )
     if main_menu == "0":
         print("Exit")
@@ -203,18 +164,12 @@ def ui():
                 find_again_upper = find_again.upper()
             find = find_again_upper
         ui()
-    elif main_menu == "3":
-        load_packages_submenu()
-        ui()
 
-    elif main_menu == "4":
-        if not has_packages_loaded:
-            print("Packages must be loaded onto trucks first!")
-            ui()
+    elif main_menu == "3":
         delivery_submenu()
         ui()
 
-    elif main_menu == "5":
+    elif main_menu == "4 ":
         visualize_submenu()
         ui()
     else:

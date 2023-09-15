@@ -270,12 +270,14 @@ def _find_shortest_route_to_deliver(truck, graph):
     start_vertex1 = truck.route[0]
     # Initialize total_distance traveled by truck to 0
     total_distance = 0
-    # Calculate the shortest distances and pred_vertex using Dijkstra's algorithm of the truck's route
-    distances1, pred_vertex1 = algo.dijkstra(graph, start_vertex1, truck.route)
+
     # Use a for loop to iterate over the packages
     for package in packages_copy:
         # Vertex to travel to
         dest_vertex = package.address
+
+        # Calculate the shortest distances and pred_vertex using Dijkstra's algorithm of the truck's route
+        distances1, pred_vertex1 = algo.dijkstra(graph, start_vertex1, truck.route)
 
         # Insert the calculated distances and pred_vertex into the Trucks object
         truck.insert_distances_pred_vertex(distances1[dest_vertex], pred_vertex1[dest_vertex])
@@ -292,6 +294,9 @@ def _find_shortest_route_to_deliver(truck, graph):
         if distances1[dest_vertex] != 0:
             total = distances1[dest_vertex]
             total_distance += total
+
+        # Set the current location to the destination of the current package
+        start_vertex1 = dest_vertex
 
     return total_distance
 
@@ -401,30 +406,39 @@ def deliver_truck3_packages(truck3, graph, start_interval, end_interval):
     new_city = 'Salt Lake City'
     new_state = 'UT'
     new_zipcode = '84111'
-    new_special_notes = 'Address updated from 300 State St to 410 S State St'
+    new_special_notes = 'Address updated from 300 State St to 410 S State St at 10:20 AM'
     time_tracker.update_package_status(package_to_update, new_address, new_city, new_state, new_zipcode,
                                        new_special_notes, end_interval)
     filtered_packages = truck3.time_tracker.get_filtered_packages_by_time_range(start_interval, end_interval)
     truck3.insert_filtered_packages(filtered_packages)
 
 
-def print_all_package_status_delivery(truck_list, start_interval, end_interval):
+def print_all_package_status_delivery(truck_list):
     all_packages = []
     distances = 0
     for truck in truck_list:
         all_packages.extend(truck.get_filtered_packages())
         distances += sum(truck.get_distances())
-    print("Start time:", start_interval, "End time:", end_interval)
-    print('Total Number of Packages:', len(all_packages))
-    print('All Packages:', all_packages)
-    print(f'Total Distance Travelled: {distances} miles \n')
+
+    print("Packages:", len(all_packages))
+    print("Total Distance:", distances, "miles")
+    for package in all_packages:
+        details = package.split('|')
+        compact_details = [
+            details[0].replace('Package ID: ', 'ID:'),  # Only show ID
+            details[2],  # Status
+            details[3],  # Deadline
+            details[4],  # Time delivered
+            details[5]  # Truck
+        ]
+        print(", ".join([detail.strip() for detail in compact_details]))
 
 
-def print_truck_delivery_status(trucks, start_interval, end_interval):
+def print_truck_delivery_status(trucks, current_time):
     distances = {}
     for truck in trucks:
         distances[truck.truck_id] = 0
-        print("Start time:", start_interval, "End time:", end_interval)
+        print('Current Time:', current_time)
         print('Truck:', truck.truck_name)
         print(f"Packages on truck {truck.truck_id}:", len(truck.filtered_packages))
         truck.print_filtered_packages()
@@ -453,8 +467,10 @@ medium_priority.time_tracker.initialize_multiple_package_status(medium_priority.
 low_priority.time_tracker.initialize_multiple_package_status(low_priority.get_packages(), 'AT_HUB')
 
 trucks_list = [high_priority, medium_priority, low_priority]
-# deliver_packages(trucks_list, ds.graph_access, '7:00 AM', '8:00 AM')
-# print_all_package_status_delivery(trucks_list, '7:00 AM', '8:00 AM')
-# print_truck_delivery_status(trucks_list, '7:00 AM', '8:00 AM')
+start_interval = '12:03 PM'
+end_interval = '1:12 PM'
+deliver_packages(trucks_list, ds.graph_access, start_interval, end_interval)
+print_truck_delivery_status(trucks_list, end_interval)
+print_all_package_status_delivery(trucks_list)
 # high_priority.time_tracker.lookup_single_package_status(13, '9:00 AM')
 # high_priority.visualize.visualize_truck_route(high_priority.truck_id, high_priority.truck_name)

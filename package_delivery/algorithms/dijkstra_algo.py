@@ -52,7 +52,7 @@ def dijkstra(graph1, src, route):
             # between the current_vertex and the neighbor to the distance of the current_vertex.
             total_distance = current_distance + weight
             # If the calculated distance is smaller than the current known distance to the neighbor,
-            # update the distances dictionary with the new, smaller distance.
+            # update the distance dictionary with the new, smaller distance.
             if total_distance < distances[neighbor]:
                 distances[neighbor] = total_distance
                 # Update the predecessor vertex for the 'neighbor' vertex to be the 'current_vertex'.
