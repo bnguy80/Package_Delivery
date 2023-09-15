@@ -68,3 +68,22 @@ def validate_time_format(time_str):
     except ValueError:
         print("Invalid time format! Please use 'HH:MM AM/PM' format.")
         return False
+
+
+def time_plus_delta(t, delta):
+    """
+    Add a timedelta to a datetime.time object.
+
+    Parameters:
+    - time_obj (datetime.time): The time object to add the timedelta to.
+    - time_delta (datetime.timedelta): The timedelta to add to the time object.
+
+    Returns:
+        datetime.time: The resulting time object after adding the timedelta.
+    """
+    # Convert the time to a datetime object
+    dt = datetime.combine(datetime.today(), t)
+    # Add the timedelta
+    dt += delta
+    # Extract the time part and return
+    return dt.time()

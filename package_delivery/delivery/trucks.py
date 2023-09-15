@@ -467,8 +467,8 @@ medium_priority.time_tracker.initialize_multiple_package_status(medium_priority.
 low_priority.time_tracker.initialize_multiple_package_status(low_priority.get_packages(), 'AT_HUB')
 
 trucks_list = [high_priority, medium_priority, low_priority]
-start_interval = '12:03 PM'
-end_interval = '1:12 PM'
+start_interval = '8:00 AM'
+end_interval = '8:00 AM'
 deliver_packages(trucks_list, ds.graph_access, start_interval, end_interval)
 print_truck_delivery_status(trucks_list, end_interval)
 print_all_package_status_delivery(trucks_list)

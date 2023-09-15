@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from package_delivery.datastructures import graph_access
 from package_delivery.datastructures.hash_map import HashMapEntry
 from package_delivery.timeutil import time_util as util
@@ -389,9 +391,8 @@ class TimeTracker:
         filtered_packages = []
         start_time = util.convert_12h_to_24h_datetime(start_interval)
         end_time = util.convert_12h_to_24h_datetime(end_interval)
-
-        if start_time > end_time:
-            raise ValueError("Invalid time range")
+        # Incase start_time is equal to end_time
+        end_time = util.time_plus_delta(end_time, timedelta(minutes=1))
 
         for package, status_info in self.packages_status.items():
             time_delivered_str = status_info['time_delivered']
