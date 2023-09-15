@@ -48,8 +48,9 @@ Required Python packages as listed in requirements.txt.
 
 1. Clone the repository or download the project zip.
 2. Navigate to the project directory: cd\path_to_Package_Delivery_Program_New
-3. Activate virtual environment: venv\Scripts\activate
-4. Install the required packages: pip install -r requirements.txt
+3. Create a virtual environment: python -m venv venv
+4. Activate virtual environment: venv\Scripts\activate
+5. Install the required packages: pip install -r requirements.txt
 
 **Running the Program:**
 
