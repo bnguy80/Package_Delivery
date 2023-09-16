@@ -391,35 +391,29 @@ class TimeTracker:
         start_time = util.convert_12h_to_24h_datetime(start_interval)
         end_time = util.convert_12h_to_24h_datetime(end_interval)
         # Incase start_time is equal to end_time
-        end_time = util.time_plus_delta(end_time, timedelta(minutes=1))
-
+        end_time = util.time_plus_delta(end_time, timedelta(seconds=30))
         for package, status_info in self.packages_status.items():
             time_delivered_str = status_info['time_delivered']
             time_to_start_delivery_str = status_info['time_to_start_delivery']
             try:
                 time_delivered = util.convert_time_str_to_datetime(time_delivered_str)
                 time_start_delivery = util.convert_time_str_to_datetime(time_to_start_delivery_str)
-                if time_start_delivery > start_time and time_start_delivery > end_time:
-                    filtered_packages.append(format_output(package.package_id, package.address, status_info['status'],
-                                                           status_info['delivery_deadline'],
-                                                           status_info['time_delivered'], status_info['truck']))
+                status_info_copy = status_info.copy()
+                if time_start_delivery > end_time:
+                    # Package is still at the hub
+                    status_info_copy['status'] = 'AT_HUB'
                 elif start_time <= time_delivered <= end_time or time_delivered < start_time:
-                    status_info_copy = status_info.copy()
+                    # Package has been delivered
                     status_info_copy['status'] = 'DELIVERED'
-                    filtered_packages.append(
-                        format_output(package.package_id, package.address, status_info_copy['status'],
-                                      status_info['delivery_deadline'], status_info_copy['time_delivered'],
-                                      status_info_copy['truck']))
-                elif time_delivered > end_time > time_start_delivery:
-                    status_info_copy = status_info.copy()
+                elif time_start_delivery < end_time < time_delivered:
+                    # The Package is in transit
                     status_info_copy['status'] = 'IN_TRANSIT'
-                    filtered_packages.append(
-                        format_output(package.package_id, package.address, status_info_copy['status'],
-                                      status_info['delivery_deadline'], status_info_copy['time_delivered'],
-                                      status_info_copy['truck']))
+                filtered_packages.append(format_output(package.package_id, package.address, status_info_copy['status'],
+                                                       status_info_copy['delivery_deadline'],
+                                                       status_info_copy['time_delivered'],
+                                                       status_info_copy['truck'],))
             except ValueError as e:
                 print(f"Error parsing time for package {package}: {e}, time_delivered: {0}")
-
         return filtered_packages
 
 
@@ -444,4 +438,4 @@ def format_output(package_id, address, status, delivery_deadline, time_delivered
             f"Status: {status} | "
             f"Delivery Deadline: {delivery_deadline} | "
             f"Time Delivered: {time_delivered} | "
-            f"Truck: {truck}")
+            f"Truck: {truck} | ")
