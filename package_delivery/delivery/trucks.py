@@ -1,6 +1,6 @@
 from package_delivery import algorithms as algo
 from package_delivery import datastructures as ds
-from package_delivery.delivery.logistics.fuel_tracker import FuelTracker
+# from package_delivery.delivery.logistics.fuel_tracker import FuelTracker
 from package_delivery.delivery.logistics.time_tracker import TimeTracker
 from package_delivery.loadutil import load_util as util
 from package_delivery.visualization.visualize import Visualize
@@ -64,7 +64,7 @@ class Trucks:
         self.visualize = Visualize(self.__truck_id)
         # Composite class relationship, Trucks object 'has a' FuelTracker object relationship to track a fuel
         # Singleton design pattern to manage the data state of each truck
-        self.fuel_tracker = FuelTracker(self.__truck_id)
+        # self.fuel_tracker = FuelTracker(self.__truck_id)
 
     @property
     def truck_id(self):
@@ -348,7 +348,7 @@ def deliver_packages(trucks, graph, start_interval, end_interval):
                 # Update miles traveled for the current truck
                 time_tracker.update_miles_traveled(total_distance)
                 # Update fuel level for the current truck
-                current_truck.fuel_tracker.update_fuel_level(current_truck.truck_id, current_truck.time_tracker)
+                # current_truck.fuel_tracker.update_fuel_level(current_truck.truck_id, current_truck.time_tracker)
 
             # Check if truck 1 has completed its delivery
             if current_truck == high_priority and current_truck.time_tracker.is_delivery_completed():
@@ -397,7 +397,7 @@ def deliver_truck3_packages(truck3, graph, start_interval, end_interval):
     # Update miles traveled for the current truck
     time_tracker.update_miles_traveled(total_distance)
     # Update fuel level for the current truck
-    truck3.fuel_tracker.update_fuel_level(truck3.truck_id, truck3.time_tracker)
+    # truck3.fuel_tracker.update_fuel_level(truck3.truck_id, truck3.time_tracker)
 
     # Check if the time is over 10: 20 AM
     # If so, update the package with ID 9 to the new address
