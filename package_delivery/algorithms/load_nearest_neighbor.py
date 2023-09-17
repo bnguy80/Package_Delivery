@@ -78,6 +78,6 @@ def load_packages_nearest_neighbor(trucks, graph, track_package_id):
             else:
                 # Break out of the while loop if there are no more packages to load
                 break
-        # Update addresses so visualization works
+        # Update addresses so visualization works and add hub back to route
         truck.route.append('4001 South 700 East')
         truck.visualize.update_address(truck.route, truck.truck_id)
