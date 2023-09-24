@@ -169,7 +169,7 @@ def ui():
         delivery_submenu()
         ui()
 
-    elif main_menu == "4 ":
+    elif main_menu == "4":
         visualize_submenu()
         ui()
     else:
