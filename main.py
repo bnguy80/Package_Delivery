@@ -83,7 +83,7 @@ def visualize_submenu():
             "[0] Exit\n"
             "[1] Visualize Individual Package Locations\n"
             "[2] Visualize Specific Truck Route\n"
-            "[3] Visualize All Truck Routes\n"
+            "[3] Visualize All Truck Routes\n\n"
         )
         if sub_menu == "0":
             print("Returning to main menu")
@@ -134,7 +134,7 @@ def ui():
         "[1] View All Package Details\n"
         "[2] View Details of a Specific Package (using Package ID) \n"
         "[3] Run Delivery Simulation \n"
-        "[4] Visualize delivery simulation \n"
+        "[4] Visualize delivery simulation\n"
     )
     if main_menu == "0":
         print("Exit")
@@ -174,6 +174,7 @@ def ui():
         ui()
     else:
         print("Invalid option, please try again")
+        ui()
 
 
 print("ID:003964281")
