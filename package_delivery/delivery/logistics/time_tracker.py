@@ -408,17 +408,19 @@ class TimeTracker:
                 elif time_start_delivery < end_time < time_delivered:
                     # The Package is in transit
                     status_info_copy['status'] = 'IN_TRANSIT'
-                filtered_packages.append(format_output(package.package_id, package.address, status_info_copy['status'],
+                filtered_packages.append(format_output(package.package_id, package.address,
+                                                       status_info_copy['status'],
                                                        status_info_copy['delivery_deadline'],
-                                                       status_info_copy['time_delivered'],
-                                                       status_info_copy['truck'],))
+                                                       status_info_copy['time_delivered'], status_info_copy['truck'],
+                                                       package.city, package.state, package.zipcode,
+                                                       package.mass, package.special_notes))
             except ValueError as e:
                 print(f"Error parsing time for package {package}: {e}, time_delivered: {0}")
         return filtered_packages
 
 
 # Function to format filtered packages from get_filtered_packages_by_time_range
-def format_output(package_id, address, status, delivery_deadline, time_delivered, truck):
+def format_output(package_id, address, status, delivery_deadline, time_delivered, truck, city, state, zipcode, mass, special_notes):
     """
     Format the output of the package information.
 
@@ -429,12 +431,22 @@ def format_output(package_id, address, status, delivery_deadline, time_delivered
         delivery_deadline (str): The deadline for delivery.
         time_delivered (str): The time the package was delivered.
         truck (str): The truck used for delivery.
+        city (str): The city of the package's destination.
+        state (str): The state of the package's destination.
+        zipcode (str): The zipcode of the package's destination.
+        mass (str): The mass/weight of the package.
+        special_notes (str): Any special notes related to the package.
 
     Returns:
         str: The formatted output of the package information.
     """
     return (f"Package ID: {package_id} | "
             f"Address: {address} | "
+            f"City: {city} | "
+            f"State: {state} | "
+            f"Zipcode: {zipcode} | "
+            f"Mass: {mass} | "
+            f"Special Notes: {special_notes} | "
             f"Status: {status} | "
             f"Delivery Deadline: {delivery_deadline} | "
             f"Time Delivered: {time_delivered} | "
