@@ -107,4 +107,4 @@ def two_opt_route(trucks, graph):
                 added_packages.add(package)  # Mark the package as added
     trucks.packages = optimized_packages
     # Make sure the address is updated for visualization
-    trucks.visualize.update_address(trucks.route, trucks.truck_id)
+    # trucks.visualize.update_address(trucks.route, trucks.truck_id)
